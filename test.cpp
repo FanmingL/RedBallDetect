@@ -13,7 +13,7 @@ int main(int argc, const char * argv[]) {
     cv::Mat origin;
     if (argc==1)
     {
-        origin=cv::imread("/Users/erdou/Downloads/test1.jpg",1);
+        origin=cv::imread("./testpic/test1.jpg",1);
     }
     else
     {
