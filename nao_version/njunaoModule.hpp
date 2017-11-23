@@ -63,6 +63,16 @@ public:
     void ContinuousFindBall();
     
     /**
+     *返回一个容器(x)，x为杆横坐标与图像width的比值
+     */
+    std::vector<float> PoleFind();
+    
+    /**
+     *持续寻找杆，并将球的位置存在"njunaoPolePosition"中
+     */
+    void ContinuousFindPole();
+    
+    /**
      *init函数，在构造函数之后立刻被自动调用
      */
     void init();

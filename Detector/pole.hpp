@@ -1,19 +1,18 @@
 //
-//  Detect.hpp
+//  pole.hpp
 //  RedBallDetect
 //
-//  Created by Fanming Luo on 2017/11/19.
+//  Created by Fanming Luo on 2017/11/23.
 //  Copyright © 2017年 Fanming Luo. All rights reserved.
 //
 
-#ifndef _Detect_hpp_
-#define _Detect_hpp_
+#ifndef pole_hpp
+#define pole_hpp
 #include <vector>
 #include <iostream>
 #include "opencv2/core/core.hpp"
 #include "opencv2/imgproc/imgproc.hpp"
 #include "opencv2/highgui/highgui.hpp"
 #include "opencv2/opencv.hpp"
-std::vector<float> DetectRedBall(cv::Mat &originalImage);
-#endif /* Detect_hpp */
-
+std::vector<float> DetectPole(cv::Mat &originalImage);
+#endif /* pole_hpp */

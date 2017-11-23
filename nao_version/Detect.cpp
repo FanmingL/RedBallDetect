@@ -7,9 +7,16 @@
 //
 #include "main.hpp"
 void on_mouse(int EVENT, int x, int y, int flags, void* userdata);
-std::vector<double> DetectRedBall(cv::Mat &originalImage){
-    std::vector<double> BallPosition;
+std::vector<float> DetectRedBall(cv::Mat &originalImage){
+    std::vector<float> BallPosition;
     BallPosition.push_back(0);BallPosition.push_back(0);BallPosition.push_back(0);
+    if (originalImage.empty())
+    {
+        return BallPosition;
+        
+    }
+
+    
     cv::Mat hsvImage,GreenMask,RedMask,RedMaskFiltered,GreenMaskFiltered,OutMask,OutMaskFiltered;
     cv::Mat element;
     std::vector<cv::Mat> hsvChannels;
@@ -50,12 +57,12 @@ std::vector<double> DetectRedBall(cv::Mat &originalImage){
     if (SecondMaxArea>0){
         cv::drawContours(GreenMaskFiltered, contours, SecondMaxAreaIndex, cv::Scalar(255,255,255), -1);
     }
-    element=cv::getStructuringElement(cv::MORPH_ELLIPSE,cv::Size(2*60+1,2*60+1));
+    element=cv::getStructuringElement(cv::MORPH_ELLIPSE,cv::Size(2*55+1,2*55+1));
     cv::morphologyEx(GreenMaskFiltered,GreenMaskFiltered,cv::MORPH_CLOSE,element);
     OutMask=RedMask&GreenMaskFiltered;
-    //element=cv::getStructuringElement(cv::MORPH_ELLIPSE,cv::Size(2*2+1,2*2+1));
-    //cv::morphologyEx(OutMask,OutMaskFiltered,cv::MORPH_OPEN,element);
-    OutMask.copyTo(MaskToFindContour);
+    element=cv::getStructuringElement(cv::MORPH_ELLIPSE,cv::Size(2*1+1,2*1+1));
+    cv::morphologyEx(OutMask,OutMaskFiltered,cv::MORPH_OPEN,element);
+    OutMaskFiltered.copyTo(MaskToFindContour);
     findContours( MaskToFindContour, contours , hierarchy , CV_RETR_CCOMP , CV_CHAIN_APPROX_SIMPLE );
     maxArea=0;
     maxAreaIndex=0;
@@ -72,7 +79,7 @@ std::vector<double> DetectRedBall(cv::Mat &originalImage){
     }
     OutMaskFiltered=cv::Mat(OutMask.rows,OutMask.cols,CV_8UC1,cv::Scalar(0));
     if (contours.size()>0){
-        cv::drawContours(OutMaskFiltered, contours, maxAreaIndex, cv::Scalar(255), -1);
+        //cv::drawContours(OutMaskFiltered, contours, maxAreaIndex, cv::Scalar(255), -1);
         //element=cv::getStructuringElement(cv::MORPH_ELLIPSE,cv::Size(2*4+1,2*4+1));       //for a better circle
         //cv::morphologyEx(OutMaskFiltered,OutMaskFiltered,cv::MORPH_CLOSE,element);
         cv::Rect maxRect = boundingRect( maxcontours );

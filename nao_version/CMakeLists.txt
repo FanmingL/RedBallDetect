@@ -9,6 +9,8 @@ set(_srcs
   njunaoModule.hpp
   Detect.cpp
   Detect.hpp
+  pole.cpp
+  pole.hpp
 )
 #qi_create_bin(njunaoModule ${_srcs})
 qi_create_lib(njunaoModule SHARED ${_srcs} SUBFOLDER naoqi)
