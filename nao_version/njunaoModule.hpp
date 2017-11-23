@@ -10,6 +10,7 @@
 #include <iostream>
 #include "opencv2/core/core.hpp"
 #include <boost/shared_ptr.hpp>
+#include <alproxies/almemoryproxy.h>
 #include <alcommon/almodule.h>
 #include <alproxies/alvideodeviceproxy.h>
 #include <vector>
@@ -56,7 +57,12 @@ public:
     std::vector<float> RedBallFind();
     
     /**
-     *初始化代理
+     *持续寻找球，并将球的位置存在"njunaoBallPosition"中
+     */
+    void ContinuousFindBall();
+    
+    /**
+     *init函数，在构造函数之后立刻被自动调用
      */
     void init();
     
@@ -64,6 +70,7 @@ public:
      *关闭
      */
     void exit();
+    
     
 private:
     /**
@@ -74,6 +81,9 @@ private:
     //读取图像所用的代理
     boost::shared_ptr<AL::ALVideoDeviceProxy> fCamProxy;
     
+    //读写memory代理
+    AL::ALMemoryProxy fMemProxy;
+    
     //代理名字
     std::string fVideoClientName;
     
@@ -83,11 +93,9 @@ private:
     //用于存放当前帧的Mat
     cv::Mat fIplImageHeader;
     
-    const std::string kOriginalName = "njuRedBallmodule";
+    bool StartDetect;
     
-    const int kImgDepth = 8;
-    
-    const int kFps = 30;
+    bool Detecting;
     
     int imgWidth;
     

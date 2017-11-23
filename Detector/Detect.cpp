@@ -5,7 +5,7 @@
 //  Created by Fanming Luo on 2017/11/19.
 //  Copyright © 2017年 Fanming Luo. All rights reserved.
 //
-#include "Detect.hpp"
+#include "main.hpp"
 void on_mouse(int EVENT, int x, int y, int flags, void* userdata);
 std::vector<double> DetectRedBall(cv::Mat &originalImage){
     std::vector<double> BallPosition;

@@ -9,11 +9,15 @@
 
 #include <qi/log.hpp>
 #include <alvision/alimage.h>
+#include <alproxies/almemoryproxy.h>
 using namespace AL;
 njunaoModule::njunaoModule(boost::shared_ptr<ALBroker> broker,const std::string& name):
   ALModule(broker, name),
+    fMemProxy(getParentBroker()),
   fRegisteredToVideoDevice(false),
-  fIplImageHeader(cv::Mat())
+  fIplImageHeader(cv::Mat()),
+    Detecting(false),
+    StartDetect(false)
 {
     setModuleDescription( "A module write by NJUer for contest"
                          "This is an example of a generic video module. "
@@ -46,10 +50,8 @@ njunaoModule::njunaoModule(boost::shared_ptr<ALBroker> broker,const std::string&
     functionName( "RedBallFind", getName(), "Find the red ball on the green ground." );
     BIND_METHOD( njunaoModule::RedBallFind );
     
-    functionName( "init", getName(), "Init." );
-    BIND_METHOD( njunaoModule::init );
-    
-    
+    functionName( "ContinuousFindBall", getName(), "Continuous Find RedBall" );
+    BIND_METHOD( njunaoModule::ContinuousFindBall );
 }
 
 njunaoModule::~njunaoModule()
@@ -58,7 +60,7 @@ njunaoModule::~njunaoModule()
     {
         if(fCamProxy)
             fCamProxy->unsubscribe(fVideoClientName);
-        
+        if (StartDetect)StartDetect=false;
         fCamProxy.reset();
     }
     catch(const AL::ALError& e)
@@ -72,6 +74,9 @@ void njunaoModule::registerToVideoDevice(const int &pResolution, const int &pCol
     if (fRegisteredToVideoDevice) {
         return;
     }
+    const std::string kOriginalName = "njuRedBallmodule";
+    const int kImgDepth = 8;
+    const int kFps = 30;
     int type;
     int imgNbLayers = 0;
     if (!fIplImageHeader.empty()) fIplImageHeader.release();
@@ -83,10 +88,12 @@ void njunaoModule::registerToVideoDevice(const int &pResolution, const int &pCol
         fVideoClientName = fCamProxy->subscribe(kOriginalName, pResolution, pColorSpace, kFps );
     qiLogInfo("vision.genericvideomodule") << "Module registered as " << fVideoClientName << std::endl;
     fRegisteredToVideoDevice = true;
+    StartDetect=true;
 }
 
 void njunaoModule::unRegisterFromVideoDevice()
 {
+    StartDetect=false;
     if (!fIplImageHeader.empty())
         fIplImageHeader.release();
     qiLogInfo("vision.njunaoModule") << "try to unregister " << fVideoClientName << " module." << std::endl;
@@ -126,21 +133,71 @@ void njunaoModule::RefeshMat()
 
 std::vector<float> njunaoModule::RedBallFind()
 {
-    RefeshMat();
-    std::vector<double> RedBallPosition=DetectRedBall(fIplImageHeader);
+
     std::vector<float> PosTrans;
     PosTrans.push_back(0);
     PosTrans.push_back(0);
-    if (!(RedBallPosition[0]==0&&RedBallPosition[1]==0&&RedBallPosition[2]==0))
-    {
-        if (!(imgWidth==0||imgHeight==0))
+    if (!Detecting){
+        if (StartDetect)
         {
-            PosTrans[0]=RedBallPosition[0]/(1.0f*imgWidth);
-            PosTrans[1]=RedBallPosition[1]/(1.0f*imgHeight);
+            Detecting=true;
+            RefeshMat();
+            std::vector<double> RedBallPosition=DetectRedBall(fIplImageHeader);
+   
+
+            if (!(RedBallPosition[0]==0&&RedBallPosition[1]==0&&RedBallPosition[2]==0))
+            {
+                if (!(imgWidth==0||imgHeight==0))
+                {
+                    PosTrans[0]=RedBallPosition[0]/(1.0f*imgWidth);
+                    PosTrans[1]=RedBallPosition[1]/(1.0f*imgHeight);
+                }
+            }
         }
+        Detecting=false;
     }
+
     return PosTrans;
 }
+
+void njunaoModule::ContinuousFindBall()
+{
+    std::vector<float> PosTrans;
+    PosTrans.push_back(0);
+    PosTrans.push_back(0);
+    if (!Detecting)
+    {
+        while (StartDetect)
+        {
+            Detecting=true;
+            RefeshMat();
+            std::vector<double> RedBallPosition=DetectRedBall(fIplImageHeader);
+            
+            
+            if (!(RedBallPosition[0]==0&&RedBallPosition[1]==0&&RedBallPosition[2]==0))
+            {
+                if (!(imgWidth==0||imgHeight==0))
+                {
+                    PosTrans[0]=RedBallPosition[0]/(1.0f*imgWidth);
+                    PosTrans[1]=RedBallPosition[1]/(1.0f*imgHeight);
+                    fMemProxy.insertData("njunaoBallPosition",PosTrans);
+                    fMemProxy.raiseEvent("njuFindBall",PosTrans);
+                }
+                
+            }
+            if (fMemProxy.getData("njunaoBallPositionStopFlag"))
+            {
+                unRegisterFromVideoDevice();
+                //exit();
+                break;
+            }
+        }
+        Detecting=false;
+        
+    }
+    
+}
+
 
 void njunaoModule::exit()
 {
@@ -150,22 +207,34 @@ void njunaoModule::exit()
 
 void njunaoModule::init()
 {
+    std::vector<float> PosTrans;
+    PosTrans.push_back(0);
+    PosTrans.push_back(0);
+    fMemProxy.insertData("njunaoBallPositionStopFlag",0);
+    fMemProxy.insertData("njunaoBallPosition",PosTrans);
+    fMemProxy.subscribeToEvent("njuFindBall","njunaoModule","njunaoBallPosition");
+    
     try {
         fCamProxy = boost::shared_ptr<ALVideoDeviceProxy>(new ALVideoDeviceProxy(getParentBroker()));
+        
     } catch (const AL::ALError& e) {
-        qiLogError("vision.genericvideomodule") << "Error while getting proxy on ALVideoDevice.  Error msg " << e.toString() << std::endl;
+        qiLogError("vision.njunaomodule") << "Error while getting proxy on ALVideoDevice.  Error msg " << e.toString() << std::endl;
         njunaoModule::exit();
         return;
     }
     if(fCamProxy == NULL)
     {
-        qiLogError("vision.genericvideomodule") << "Error while getting proxy on ALVideoDevice. Check ALVideoDevice is running." << std::endl;
+        qiLogError("vision.njunaomodule") << "Error while getting proxy on ALVideoDevice. Check ALVideoDevice is running." << std::endl;
         njunaoModule::exit();
         return;
     }
     
-    qiLogInfo("vision.genericvideomodule") << "Use registerToVideoDevice + "
+    qiLogInfo("vision.njunaomodule") << "Use registerToVideoDevice + "
     "saveImageLocal + unRegisterFromVideoDevice to save images." << std::endl;
 }
+
+
+
+
 
 
