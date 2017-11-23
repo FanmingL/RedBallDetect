@@ -10,6 +10,7 @@
 #include <qi/log.hpp>
 #include <alvision/alimage.h>
 #include <alproxies/almemoryproxy.h>
+#include <alproxies/altexttospeechproxy.h>
 using namespace AL;
 njunaoModule::njunaoModule(boost::shared_ptr<ALBroker> broker,const std::string& name):
   ALModule(broker, name),
@@ -17,7 +18,8 @@ njunaoModule::njunaoModule(boost::shared_ptr<ALBroker> broker,const std::string&
   fRegisteredToVideoDevice(false),
   fIplImageHeader(cv::Mat()),
     Detecting(false),
-    StartDetect(false)
+    StartDetect(false),
+tts(getParentBroker())
 {
     setModuleDescription( "A module write by NJUer for contest"
                          "This is an example of a generic video module. "
@@ -207,6 +209,8 @@ void njunaoModule::exit()
 
 void njunaoModule::init()
 {
+    const std::string phraseToSay = "Init Ok,version 1.0";
+    tts.post.say(phraseToSay);
     std::vector<float> PosTrans;
     PosTrans.push_back(0);
     PosTrans.push_back(0);

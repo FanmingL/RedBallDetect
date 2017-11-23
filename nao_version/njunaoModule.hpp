@@ -13,6 +13,7 @@
 #include <alproxies/almemoryproxy.h>
 #include <alcommon/almodule.h>
 #include <alproxies/alvideodeviceproxy.h>
+#include <alproxies/altexttospeechproxy.h>
 #include <vector>
 namespace AL
 {
@@ -83,6 +84,9 @@ private:
     
     //读写memory代理
     AL::ALMemoryProxy fMemProxy;
+    
+    //说话代理
+    AL::ALTextToSpeechProxy tts;
     
     //代理名字
     std::string fVideoClientName;
