@@ -17,6 +17,6 @@ $(TARGET):$(OBJS)
 	$(CC) $(CFLAGS) -o $@ $^ $(INC) $(LIB) $(LIBVAR)
 	rm -rf $(OBJS)
 %.o:%.cpp
-	$(CC) $(CFLAGS) $(INC)  -o $@ -c $< 
+	$(CC) $(CFLAGS) $(INC)  -o $@ -c $< $(LIB) $(LIBVAR)
 clean:
 	rm -rf $(TARGET) $(SOTARGET)
