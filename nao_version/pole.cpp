@@ -8,6 +8,7 @@
 
 #include "main.hpp"
 void on_mouse2(int EVENT, int x, int y, int flags, void* userdata);
+#define _MY_ABS(x) (((x)>0)?((x)):(-(x)))
 std::vector<float> DetectPole(cv::Mat &originalImage)
 {
     std::vector<float> angle;
@@ -32,6 +33,9 @@ std::vector<float> DetectPole(cv::Mat &originalImage)
     cv::HoughLines(yellowMaskFiltered, lines, 1, CV_PI/180, 50 );
     float Xcenter=0.0f,x_num=0;
     float x1_sum=0.0f,x2_sum=0.0f;
+    std::vector<float> Xcenter_filter,Xcenter_error;
+    std::vector<float> X1_filter,X2_filter;
+    
     for( size_t i = 0; i < lines.size(); i++ )//将求得的线条画出来
     {
         float rho = lines[i][0], theta = lines[i][1];
@@ -41,8 +45,11 @@ std::vector<float> DetectPole(cv::Mat &originalImage)
         x2=rho/cos(theta)-originalImage.rows*tan(theta);
         x1_sum+=x1;
         x2_sum+=x2;
+        X1_filter.push_back(x1);
+        X2_filter.push_back(x2);
         float x_center=(x1+x2)/2.0f;
-        Xcenter+=x_center;
+        Xcenter_filter.push_back(x_center);
+      //  Xcenter+=x_center;
         x_num++;
 #ifdef TEST
         std::cout<<"x_center "<<x_center<<std::endl;
@@ -56,6 +63,42 @@ std::vector<float> DetectPole(cv::Mat &originalImage)
        //cv::line( LineImage, pt1, pt2, cv::Scalar(0,0,255), 3, CV_AA);
 #endif
     }
+    if (Xcenter_filter.size()==0)
+    {
+        std::cout<<"no pole"<<std::endl;
+        return angle;
+    }
+    for (int i=0;i<Xcenter_filter.size();i++)
+    {
+        Xcenter+=Xcenter_filter[i];
+        x_num++;
+    }
+    Xcenter/=x_num;
+    for (int i=0;i<Xcenter_filter.size();i++)
+    {
+        Xcenter_error.push_back(Xcenter_filter[i]-Xcenter);
+    }
+    float mean_error=0;
+    for (int i=0;i<Xcenter_filter.size();i++)
+    {
+        mean_error+=Xcenter_error[i];
+    }
+    mean_error/=Xcenter_error.size();
+    Xcenter=0;
+    x_num=0;
+    x1_sum=0;
+    x2_sum=0;
+    for (int i=0;i<Xcenter_filter.size();i++)
+    {
+        if (_MY_ABS(Xcenter_error[i])<_MY_ABS(mean_error))
+        {
+            x1_sum+=X1_filter[i];
+            x2_sum+=X2_filter[i];
+            Xcenter+=Xcenter_filter[i];
+            x_num++;
+        }
+    }
+    
     LineMask=cv::Mat(originalImage.rows,originalImage.cols,CV_8UC1,cv::Scalar(0));
     if (!(x_num==0.0f))
     {

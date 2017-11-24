@@ -1,15 +1,14 @@
-﻿# 指令编译器和选项
 CC=g++
 CFLAGS=-Wall
+
 LIBVAR = -lopencv_core \
 	-lopencv_highgui \
-	-lopencv_imgproc \
-	-lopencv_imgcodecs
-# 目标文件
+	-lopencv_imgproc 
+
 TARGET=test
-SOTARGET=libredballdetector.so
 SRCS = test.cpp \
-  Detect.cpp 
+  Detect.cpp \
+  pole.cpp
 INC = -I/usr/local/include
 LIB = -L/usr/local/lib
 OBJS = $(SRCS:.cpp=.o)
@@ -17,6 +16,7 @@ $(TARGET):$(OBJS)
 	$(CC) $(CFLAGS) -o $@ $^ $(INC) $(LIB) $(LIBVAR)
 	rm -rf $(OBJS)
 %.o:%.cpp
-	$(CC) $(CFLAGS) $(INC)  -o $@ -c $< $(LIB) $(LIBVAR)
+	$(CC) $(CFLAGS) $(INC)  -o $@ -c $<  $(LIB) $(LIBVAR)
 clean:
 	rm -rf $(TARGET) $(SOTARGET)
+

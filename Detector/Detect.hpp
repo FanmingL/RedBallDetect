@@ -11,6 +11,9 @@
 #include <vector>
 #include <iostream>
 #include "opencv2/core/core.hpp"
-std::vector<double> DetectRedBall(cv::Mat &originalImage);
+#include "opencv2/imgproc/imgproc.hpp"
+#include "opencv2/highgui/highgui.hpp"
+#include "opencv2/opencv.hpp"
+std::vector<float> DetectRedBall(cv::Mat &originalImage);
 #endif /* Detect_hpp */
 
