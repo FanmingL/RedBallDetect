@@ -82,6 +82,10 @@ public:
      */
     void exit();
     
+    /**
+     *语音播报当前代码版本
+     */
+    void sayVersion();
     
 private:
     /**
@@ -106,6 +110,8 @@ private:
     
     //用于存放当前帧的Mat
     cv::Mat fIplImageHeader;
+    
+    std::string phraseToSay;
     
     bool StartDetect;
     

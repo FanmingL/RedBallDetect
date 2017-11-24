@@ -11,6 +11,7 @@
 #include <alvision/alimage.h>
 #include <alproxies/almemoryproxy.h>
 #include <alproxies/altexttospeechproxy.h>
+
 using namespace AL;
 njunaoModule::njunaoModule(boost::shared_ptr<ALBroker> broker,const std::string& name):
   ALModule(broker, name),
@@ -60,6 +61,9 @@ tts(getParentBroker())
     
     functionName( "ContinuousFindBall", getName(), "Continuous Find RedBall" );
     BIND_METHOD( njunaoModule::ContinuousFindPole );
+    
+    functionName( "sayVersion", getName(), "tell what version is it" );
+    BIND_METHOD( njunaoModule::sayVersion );
 }
 
 njunaoModule::~njunaoModule()
@@ -159,10 +163,10 @@ std::vector<float> njunaoModule::RedBallFind()
                 {
                     PosTrans[0]=RedBallPosition[0]/(1.0f*imgWidth);
                     PosTrans[1]=RedBallPosition[1]/(1.0f*imgHeight);
-                    fMemProxy.insertData("njunaoBallPosition",PosTrans);
-                    fMemProxy.raiseEvent("njuFindBall",PosTrans);
                 }
             }
+            fMemProxy.insertData("njunaoBallPosition",PosTrans);
+            fMemProxy.raiseEvent("njuFindBall",PosTrans);
         }
         Detecting=false;
     }
@@ -190,11 +194,12 @@ void njunaoModule::ContinuousFindBall()
                 {
                     PosTrans[0]=RedBallPosition[0]/(1.0f*imgWidth);
                     PosTrans[1]=RedBallPosition[1]/(1.0f*imgHeight);
-                    fMemProxy.insertData("njunaoBallPosition",PosTrans);
-                    fMemProxy.raiseEvent("njuFindBall",PosTrans);
+
                 }
                 
             }
+            fMemProxy.insertData("njunaoBallPosition",PosTrans);
+            fMemProxy.raiseEvent("njuFindBall",PosTrans);
             if (fMemProxy.getData("njunaoBallPositionStopFlag"))
             {
                 unRegisterFromVideoDevice();
@@ -219,9 +224,9 @@ std::vector<float> njunaoModule::PoleFind()
         if (!(PolePos[0]==0))
         {
             PolePos[0]=PolePos[0]/(1.0f*imgWidth);
-            fMemProxy.insertData("njunaoPolePosition",PolePos);
-            fMemProxy.raiseEvent("njuFindPole",PolePos);
         }
+        fMemProxy.insertData("njunaoPolePosition",PolePos);
+        fMemProxy.raiseEvent("njuFindPole",PolePos);
     }
     return PolePos;
 }
@@ -236,9 +241,9 @@ void njunaoModule::ContinuousFindPole()
         if (!PolePos[0])
         {
             PolePos[0]=PolePos[0]/(1.0f*imgWidth);
-            fMemProxy.insertData("njunaoPolePosition",PolePos);
-            fMemProxy.raiseEvent("njuFindPole",PolePos);
         }
+        fMemProxy.insertData("njunaoPolePosition",PolePos);
+        fMemProxy.raiseEvent("njuFindPole",PolePos);
     }
 }
 
@@ -250,7 +255,7 @@ void njunaoModule::exit()
 
 void njunaoModule::init()
 {
-    const std::string phraseToSay = "Init Ok,version 1.0";
+    phraseToSay = "Init Ok,version 1.0";
     tts.post.say(phraseToSay);
     std::vector<float> PosTrans;
     std::vector<float> PolePos;
@@ -284,6 +289,10 @@ void njunaoModule::init()
     "saveImageLocal + unRegisterFromVideoDevice to save images." << std::endl;
 }
 
+void njunaoModule::sayVersion()
+{
+    tts.post.say(phraseToSay);
+}
 
 
 
