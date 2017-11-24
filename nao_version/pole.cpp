@@ -81,7 +81,7 @@ std::vector<float> DetectPole(cv::Mat &originalImage)
     float mean_error=0;
     for (int i=0;i<Xcenter_filter.size();i++)
     {
-        mean_error+=Xcenter_error[i];
+        mean_error+=_MY_ABS(Xcenter_error[i]);
     }
     mean_error/=Xcenter_error.size();
     Xcenter=0;
