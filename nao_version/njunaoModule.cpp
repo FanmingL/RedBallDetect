@@ -237,6 +237,7 @@ void njunaoModule::ContinuousFindPole()
     PolePos.push_back(0);
     while (StartDetect){
         RefeshMat();
+		PolePos[0] = 0;
         PolePos=DetectPole(fIplImageHeader);
         if (!PolePos[0])
         {
@@ -255,7 +256,7 @@ void njunaoModule::exit()
 
 void njunaoModule::init()
 {
-    phraseToSay = "Init Ok,version 1.0";
+    phraseToSay = "Init Ok,version 1.1";
     tts.post.say(phraseToSay);
     std::vector<float> PosTrans;
     std::vector<float> PolePos;
