@@ -11,5 +11,7 @@ if __name__ == "__main__":
     PORT=9559
 
     mem=ALProxy("ALMemory",IP,PORT)
+    my_ins=ALProxy("njunaoModule",IP,PORT);
     mem.insertData("njunaoBallPositionStopFlag",1)
- 
+    mem.insertData("njunaoPolePositionStopFlag",1)
+    my_ins.unRegisterFromVideoDevice();

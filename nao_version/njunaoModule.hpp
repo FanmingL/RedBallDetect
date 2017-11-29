@@ -87,6 +87,11 @@ public:
      */
     void sayVersion();
     
+    /**
+     *
+     *开始不停的刷新图像
+     */
+    void ContinuousRefreshCam();
 private:
     /**
      *更新Mat变量
@@ -120,6 +125,10 @@ private:
     int imgWidth;
     
     int imgHeight;
+    
+    bool RefeshingFlag;
+    
+    bool PoleDetecting;
 
 };
 #endif
