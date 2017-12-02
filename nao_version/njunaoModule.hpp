@@ -92,6 +92,12 @@ public:
      *开始不停的刷新图像
      */
     void ContinuousRefreshCam();
+    
+    /**
+     *
+     *更换活动的摄像头
+     */
+    void ChangeCamera(int index);
 private:
     /**
      *更新Mat变量
@@ -129,6 +135,14 @@ private:
     bool RefeshingFlag;
     
     bool PoleDetecting;
+    
+    int expect_camera;
+    
+    std::string kOriginalName;
+    
+    int Reso;
+    
+    int pcs;
 
 };
 #endif

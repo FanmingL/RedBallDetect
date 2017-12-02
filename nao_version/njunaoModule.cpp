@@ -22,6 +22,7 @@ njunaoModule::njunaoModule(boost::shared_ptr<ALBroker> broker,const std::string&
     StartDetect(false),
     RefeshingFlag(false),
     PoleDetecting(false),
+    expect_camera(0),
 tts(getParentBroker())
 {
     setModuleDescription( "A module write by NJUer for contest"
@@ -69,6 +70,9 @@ tts(getParentBroker())
     
     functionName( "ContinuousRefreshCam", getName(), "Refresh Camera" );
     BIND_METHOD( njunaoModule::ContinuousRefreshCam );
+    
+    functionName( "ChangeCamera", getName(), "Change Camera index" );
+    BIND_METHOD( njunaoModule::ChangeCamera );
 }
 
 njunaoModule::~njunaoModule()
@@ -91,7 +95,9 @@ void njunaoModule::registerToVideoDevice(const int &pResolution, const int &pCol
     if (fRegisteredToVideoDevice) {
         return;
     }
-    const std::string kOriginalName = "njuRedBallmodule";
+    kOriginalName = "njuRedBallmodule";
+    Reso=pResolution;
+    pcs=pColorSpace;
     const int kImgDepth = 8;
     const int kFps = 30;
     int type;
@@ -279,7 +285,7 @@ void njunaoModule::exit()
 
 void njunaoModule::init()
 {
-    phraseToSay = "this version is 1.7";
+    phraseToSay = "this version is 3.1";
     tts.post.say(phraseToSay);
     std::vector<float> PosTrans;
     std::vector<float> PolePos;
@@ -319,7 +325,15 @@ void njunaoModule::ContinuousRefreshCam()
     while (RefeshingFlag)
     {
         RefeshMat();
-        usleep(30000);
+
+        usleep(60000);
+      //  if (expect_camera!=fCamProxy->getActiveCamera())
+       // {
+            //fCamProxy->unsubscribe(fVideoClientName);
+        //    fCamProxy->setActiveCamera(expect_camera);
+            //fVideoClientName = fCamProxy->subscribe(kOriginalName, Reso, pcs, 30 );
+        //    usleep(500000);
+       // }
     }
     RefeshingFlag=false;
     }
@@ -330,7 +344,10 @@ void njunaoModule::sayVersion()
     tts.post.say(phraseToSay);
 }
 
-
+void njunaoModule::ChangeCamera(int index)
+{
+    expect_camera=index;
+}
 
 
 
