@@ -11,11 +11,12 @@
 #include <alvision/alimage.h>
 #include <alproxies/almemoryproxy.h>
 #include <alproxies/altexttospeechproxy.h>
-
+#include <alproxies/almotionproxy.h>
 using namespace AL;
 njunaoModule::njunaoModule(boost::shared_ptr<ALBroker> broker,const std::string& name):
   ALModule(broker, name),
     fMemProxy(getParentBroker()),
+    motion(getParentBroker()),
   fRegisteredToVideoDevice(false),
   fIplImageHeader(cv::Mat()),
     Detecting(false),
@@ -168,14 +169,15 @@ void njunaoModule::RefeshMat()
 std::vector<float> njunaoModule::RedBallFind()
 {
 
-    std::vector<float> PosTrans;
-    PosTrans.push_back(0);
-    PosTrans.push_back(0);
+    std::vector<float> PosTrans(22,0);
+    
     if ((!Detecting)&&RefeshingFlag){
         if (StartDetect)
         {
             Detecting=true;
     //       RefeshMat();
+            std::vector<float> cam_result = motion.getPosition(fCamProxy->getCameraName(fCamProxy->getActiveCamera()), 0, true);
+            std::vector<float> cam_trans = motion.getTransform(fCamProxy->getCameraName(fCamProxy->getActiveCamera()), 2, true);
             std::vector<float> RedBallPosition=DetectRedBall(fIplImageHeader);
    
 
@@ -185,6 +187,18 @@ std::vector<float> njunaoModule::RedBallFind()
                 {
                     PosTrans[0]=RedBallPosition[0]/(1.0f*imgWidth);
                     PosTrans[1]=RedBallPosition[1]/(1.0f*imgHeight);
+                    std::vector<float> _temp;
+                    _temp.push_back(PosTrans[0]);
+                    _temp.push_back(PosTrans[1]);
+                    std::vector<float> anglar=fCamProxy->getAngularPositionFromImagePosition(fCamProxy->getActiveCamera(),_temp);
+                    
+                    PosTrans[2]=anglar[0];
+                    PosTrans[3]=anglar[1];
+                    for (int i=0;i<6;i++)PosTrans[i+4]=cam_result[i];
+                    for (int i=0;i<12;i++)PosTrans[i+10]=cam_result[i];
+                    
+                    
+                    qiLogInfo("njunaoModule")<<"find the ball, x= "<<PosTrans[0]<<", y= "<<PosTrans[1]<<std::endl;
                 }
             }
             fMemProxy.insertData("njunaoBallPosition",PosTrans);
@@ -198,26 +212,39 @@ std::vector<float> njunaoModule::RedBallFind()
 
 void njunaoModule::ContinuousFindBall()
 {
-    std::vector<float> PosTrans;
-    PosTrans.push_back(0);
-    PosTrans.push_back(0);
+    std::vector<float> PosTrans(22,0);
+
+    
     if ((!Detecting)&&RefeshingFlag)
     {
         while (StartDetect)
         {
             Detecting=true;
          //   RefeshMat();
+            std::vector<float> cam_result = motion.getPosition(fCamProxy->getCameraName(fCamProxy->getActiveCamera()), 0, true);
+            std::vector<float> cam_trans = motion.getTransform(fCamProxy->getCameraName(fCamProxy->getActiveCamera()), 2, true);
             std::vector<float> RedBallPosition=DetectRedBall(fIplImageHeader);
             
-            PosTrans[0]=0;
-            PosTrans[1]=0;
+            for (int i=0;i<PosTrans.size();i++)PosTrans[i]=0;
             if (!(RedBallPosition[0]==0&&RedBallPosition[1]==0&&RedBallPosition[2]==0))
             {
                 if (!(imgWidth==0||imgHeight==0))
                 {
                     PosTrans[0]=RedBallPosition[0]/(1.0f*imgWidth);
                     PosTrans[1]=RedBallPosition[1]/(1.0f*imgHeight);
+                    std::vector<float> _temp;
+                    _temp.push_back(PosTrans[0]);
+                    _temp.push_back(PosTrans[1]);
+                    std::vector<float> anglar=fCamProxy->getAngularPositionFromImagePosition(fCamProxy->getActiveCamera(),_temp);
+                    
+                    PosTrans[2]=anglar[0];
+                    PosTrans[3]=anglar[1];
+                    for (int i=0;i<6;i++)PosTrans[i+4]=cam_result[i];
+                    for (int i=0;i<12;i++)PosTrans[i+10]=cam_result[i];
+                    
+                    
                     qiLogInfo("njunaoModule")<<"find the ball, x= "<<PosTrans[0]<<", y= "<<PosTrans[1]<<std::endl;
+                    
                 }
                 
             }
@@ -294,14 +321,11 @@ void njunaoModule::exit()
 
 void njunaoModule::init()
 {
-    phraseToSay = "this version is 4.2";
+    phraseToSay = "this version is 5.1";
     tts.post.say(phraseToSay);
-    std::vector<float> PosTrans;
-    std::vector<float> PolePos;
-    
-    PosTrans.push_back(0);
-    PosTrans.push_back(0);
-    PolePos.push_back(0);
+    std::vector<float> PosTrans(22,0);
+    std::vector<float> PolePos(1,0);
+
     fMemProxy.insertData("njunaoBallPositionStopFlag",0);
     fMemProxy.insertData("njunaoBallPosition",PosTrans);
     fMemProxy.insertData("njunaoPolePositionStopFlag",0);

@@ -14,6 +14,7 @@
 #include <alcommon/almodule.h>
 #include <alproxies/alvideodeviceproxy.h>
 #include <alproxies/altexttospeechproxy.h>
+#include <alproxies/almotionproxy.h>
 #include <vector>
 namespace AL
 {
@@ -109,6 +110,9 @@ private:
     
     //读写memory代理
     AL::ALMemoryProxy fMemProxy;
+    
+    //动作、姿态代理
+    AL::ALMotionProxy motion;
     
     //说话代理
     AL::ALTextToSpeechProxy tts;

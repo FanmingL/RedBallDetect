@@ -566,7 +566,7 @@
                             <Output name="yaw" type="1" type_size="1" nature="2" inner="0" tooltip="" id="7" />
                             <Output name="switch" type="1" type_size="1" nature="1" inner="0" tooltip="" id="8" />
                         </Box>
-                        <Box name="judge" id="8" localization="8" tooltip="" x="185" y="235">
+                        <Box name="judge" id="8" localization="8" tooltip="" x="77" y="136">
                             <bitmap>media/images/box/box-python-script.png</bitmap>
                             <script language="4">
                                 <content>
@@ -589,6 +589,7 @@
         if (p[0]!=0):
             p[0]=(p[0]-0.5)*(60.97/180.0*3.14159)
             p[1]=(0.5-p[1])*(47.64/180.0*3.14159)
+            self.log([' roll ',str(p[7]),' pitch ',str(p[8]),' yaw ',str(p[9])])
             self.onStopped(p)
         pass]]>
 </content>
@@ -598,7 +599,7 @@
                             <Input name="input" type="0" type_size="1" nature="1" inner="0" tooltip="" id="3" />
                             <Output name="onStopped" type="0" type_size="1" nature="2" inner="0" tooltip="指令盒行为结束时，送出信号。" id="4" />
                         </Box>
-                        <Box name="move_head" id="10" localization="8" tooltip="" x="322" y="149">
+                        <Box name="move_head" id="10" localization="8" tooltip="" x="324" y="144">
                             <bitmap>media/images/box/box-python-script.png</bitmap>
                             <script language="4">
                                 <content>
@@ -619,8 +620,9 @@
     def onInput_onStart(self, p):
         angleHead = self.motionProxy.getAngles("Head",True)
         self.names = ["HeadYaw", "HeadPitch"]
-        self.angles  = [angleHead[0]-p[0], angleHead[1]-p[1]]
-        self.fractionMaxSpeed  = 0.1
+        self.PID_P=1.0
+        self.angles  = [p[9]+self.PID_P*p[2], p[8]+self.PID_P*p[3]]
+        self.fractionMaxSpeed  = 0.3
         self.motionProxy.setAngles(self.names, self.angles, self.fractionMaxSpeed)
         self.onStopped(p)
         #self.onStopped(p) #activate the output of the box
@@ -710,9 +712,10 @@
                             </Timeline>
                             <Resource name="All motors" type="Lock" timeout="0" />
                         </Box>
-                        <Link inputowner="0" indexofinput="6" outputowner="3" indexofoutput="4" />
                         <Link inputowner="2" indexofinput="2" outputowner="11" indexofoutput="4" />
+                        <Link inputowner="8" indexofinput="3" outputowner="0" indexofoutput="4" />
                         <Link inputowner="10" indexofinput="2" outputowner="8" indexofoutput="4" />
+                        <Link inputowner="0" indexofinput="6" outputowner="3" indexofoutput="4" />
                     </Diagram>
                 </BehaviorKeyframe>
             </BehaviorLayer>
