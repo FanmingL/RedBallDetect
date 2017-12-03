@@ -22,6 +22,7 @@ njunaoModule::njunaoModule(boost::shared_ptr<ALBroker> broker,const std::string&
     StartDetect(false),
     RefeshingFlag(false),
     PoleDetecting(false),
+    zyFlag(false),
     expect_camera(0),
 tts(getParentBroker())
 {
@@ -86,7 +87,7 @@ njunaoModule::~njunaoModule()
     }
     catch(const AL::ALError& e)
     {
-        qiLogError("vision.njunaoModule") <<  e.toString() << std::endl;
+        qiLogError("njunaoModule") <<  e.toString() << std::endl;
     }
 }
 
@@ -109,7 +110,7 @@ void njunaoModule::registerToVideoDevice(const int &pResolution, const int &pCol
     fIplImageHeader = cv::Mat(cv::Size(imgWidth, imgHeight), type);
     if(fCamProxy)
         fVideoClientName = fCamProxy->subscribe(kOriginalName, pResolution, pColorSpace, kFps );
-    qiLogInfo("vision.genericvideomodule") << "Module registered as " << fVideoClientName << std::endl;
+    qiLogInfo("njunaoModule") << "Module registered as " << fVideoClientName << std::endl;
     fRegisteredToVideoDevice = true;
     StartDetect=true;
     fMemProxy.insertData("njunaoBallPositionStopFlag",0);
@@ -120,14 +121,16 @@ void njunaoModule::registerToVideoDevice(const int &pResolution, const int &pCol
 void njunaoModule::unRegisterFromVideoDevice()
 {
     StartDetect=false;
+    fRegisteredToVideoDevice = false;
+    RefeshingFlag=false;
+    usleep(100000);
     if (!fIplImageHeader.empty())
         fIplImageHeader.release();
-    qiLogInfo("vision.njunaoModule") << "try to unregister " << fVideoClientName << " module." << std::endl;
+    qiLogInfo("njunaoModule") << "try to unregister " << fVideoClientName << " module." << std::endl;
     if (!fRegisteredToVideoDevice) {return;}
     if(fCamProxy)
         fCamProxy->unsubscribe(fVideoClientName);
-    fRegisteredToVideoDevice = false;
-    RefeshingFlag=false;
+
 }
 
 void njunaoModule::saveImageLocal(const std::string& pName)
@@ -142,6 +145,7 @@ void njunaoModule::saveImageLocal(const std::string& pName)
 
 void njunaoModule::RefeshMat()
 {
+    zyFlag=true;
     ALImage* imageIn = NULL;
     imageIn = (ALImage*)fCamProxy->getImageLocal(fVideoClientName);
     if (!imageIn) {
@@ -156,6 +160,7 @@ void njunaoModule::RefeshMat()
     //const int seconds = (int)(timeStamp/1000000LL);
     fIplImageHeader.data = imageIn->getData();
     fCamProxy->releaseImage(fVideoClientName);
+    zyFlag=false;
 }
 
 std::vector<float> njunaoModule::RedBallFind()
@@ -210,6 +215,7 @@ void njunaoModule::ContinuousFindBall()
                 {
                     PosTrans[0]=RedBallPosition[0]/(1.0f*imgWidth);
                     PosTrans[1]=RedBallPosition[1]/(1.0f*imgHeight);
+                    qiLogInfo("njunaoModule")<<"find the ball, x= "<<PosTrans[0]<<", y= "<<PosTrans[1]<<std::endl;
                 }
                 
             }
@@ -260,9 +266,10 @@ void njunaoModule::ContinuousFindPole()
             PoleDetecting=true;
            // RefeshMat();
             PolePos=DetectPole(fIplImageHeader);
-            if (!PolePos[0])
+            if (PolePos[0])
             {
                 PolePos[0]=PolePos[0]/(1.0f*imgWidth);
+                qiLogInfo("njunaoModule")<<"find the pole, x= "<<PolePos[0]<<std::endl;
             }
             fMemProxy.insertData("njunaoPolePosition",PolePos);
             fMemProxy.raiseEvent("njuFindPole",PolePos);
@@ -285,7 +292,7 @@ void njunaoModule::exit()
 
 void njunaoModule::init()
 {
-    phraseToSay = "this version is 3.1";
+    phraseToSay = "this version is 4.1";
     tts.post.say(phraseToSay);
     std::vector<float> PosTrans;
     std::vector<float> PolePos;
@@ -297,24 +304,26 @@ void njunaoModule::init()
     fMemProxy.insertData("njunaoBallPosition",PosTrans);
     fMemProxy.insertData("njunaoPolePositionStopFlag",0);
     fMemProxy.insertData("njunaoPolePosition",PolePos);
-    fMemProxy.subscribeToEvent("njuFindBall","njunaoModule","njunaoBallPosition");
-    fMemProxy.subscribeToEvent("njuFindPole","njunaoModule","njunaoPolePosition");
+    fMemProxy.raiseEvent("njuFindPole",PolePos);
+    fMemProxy.raiseEvent("njuFindBall",PosTrans);
+   // fMemProxy.subscribeToEvent("njuFindBall","njunaoModule","njunaoBallPosition1");
+   // fMemProxy.subscribeToEvent("njuFindPole","njunaoModule","njunaoPolePosition1");
     try {
         fCamProxy = boost::shared_ptr<ALVideoDeviceProxy>(new ALVideoDeviceProxy(getParentBroker()));
         
     } catch (const AL::ALError& e) {
-        qiLogError("vision.njunaomodule") << "Error while getting proxy on ALVideoDevice.  Error msg " << e.toString() << std::endl;
+        qiLogError("njunaoModule") << "Error while getting proxy on ALVideoDevice.  Error msg " << e.toString() << std::endl;
         njunaoModule::exit();
         return;
     }
     if(fCamProxy == NULL)
     {
-        qiLogError("vision.njunaomodule") << "Error while getting proxy on ALVideoDevice. Check ALVideoDevice is running." << std::endl;
+        qiLogError("njunaoModule") << "Error while getting proxy on ALVideoDevice. Check ALVideoDevice is running." << std::endl;
         njunaoModule::exit();
         return;
     }
     
-    qiLogInfo("vision.njunaomodule") << "Use registerToVideoDevice + "
+    qiLogInfo("njunaoModule") << "Use registerToVideoDevice + "
     "saveImageLocal + unRegisterFromVideoDevice to save images." << std::endl;
 }
 
@@ -347,6 +356,13 @@ void njunaoModule::sayVersion()
 void njunaoModule::ChangeCamera(int index)
 {
     expect_camera=index;
+    if ((expect_camera==fCamProxy->getActiveCamera()))return;
+    while (zyFlag);
+    if (fRegisteredToVideoDevice)
+        unRegisterFromVideoDevice();
+    fCamProxy->setActiveCamera(index);
+   // usleep(1000000);
+    //fVideoClientName = fCamProxy->subscribe(kOriginalName, Reso, pcs, 30 );
 }
 
 

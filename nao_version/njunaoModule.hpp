@@ -143,6 +143,8 @@ private:
     int Reso;
     
     int pcs;
+    
+    bool zyFlag;
 
 };
 #endif
