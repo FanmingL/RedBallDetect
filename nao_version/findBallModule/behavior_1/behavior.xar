@@ -92,7 +92,7 @@
                             <Input name="onStop" type="1" type_size="1" nature="3" inner="0" tooltip="Box behavior stops when a signal is received on this input." id="3" />
                             <Output name="onStopped" type="1" type_size="1" nature="1" inner="0" tooltip="指令盒行为结束时，送出信号。" id="4" />
                         </Box>
-                        <Box name="selectcam" id="16" localization="8" tooltip="" x="485" y="232">
+                        <Box name="selectcam" id="16" localization="8" tooltip="" x="524" y="125">
                             <bitmap>media/images/box/box-diagram.png</bitmap>
                             <script language="4">
                                 <content>
@@ -497,7 +497,7 @@
                             <Output name="onStopped" type="1" type_size="1" nature="1" inner="0" tooltip="指令盒行为结束时，送出信号。" id="4" />
                             <Output name="shoot" type="1" type_size="1" nature="1" inner="0" tooltip="" id="5" />
                         </Box>
-                        <Box name="headPitch" id="9" localization="8" tooltip="This box contains a basic python script and can be used to create any python script box you would like.&#x0A;&#x0A;To edit its script, double-click on it." x="485" y="90">
+                        <Box name="headPitch" id="9" localization="8" tooltip="This box contains a basic python script and can be used to create any python script box you would like.&#x0A;&#x0A;To edit its script, double-click on it." x="370" y="280">
                             <bitmap>media/images/box/box-python-script.png</bitmap>
                             <script language="4">
                                 <content>
