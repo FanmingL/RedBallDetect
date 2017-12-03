@@ -149,6 +149,15 @@ private:
     int pcs;
     
     bool zyFlag;
+    
+    cv::Mat con;
+    
+    cv::Mat map1,map2;
+    
+    cv::Mat inner;
+    
+    cv::Mat inner_inv;
+    
 
 };
 #endif

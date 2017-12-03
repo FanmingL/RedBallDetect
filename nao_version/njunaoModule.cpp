@@ -162,6 +162,7 @@ void njunaoModule::RefeshMat()
     //const long long timeStamp = imageIn->getTimeStamp();
     //const int seconds = (int)(timeStamp/1000000LL);
     fIplImageHeader.data = imageIn->getData();
+    cv::remap(fIplImageHeader,fIplImageHeader,map1,map2,cv::INTER_LINEAR);
     fCamProxy->releaseImage(fVideoClientName);
     zyFlag=false;
 }
@@ -169,7 +170,7 @@ void njunaoModule::RefeshMat()
 std::vector<float> njunaoModule::RedBallFind()
 {
 
-    std::vector<float> PosTrans(22,0);
+    std::vector<float> PosTrans(12,0);
     
     if ((!Detecting)&&RefeshingFlag){
         if (StartDetect)
@@ -195,10 +196,23 @@ std::vector<float> njunaoModule::RedBallFind()
                     PosTrans[2]=anglar[0];
                     PosTrans[3]=anglar[1];
                     for (int i=0;i<6;i++)PosTrans[i+4]=cam_result[i];
-                    for (int i=0;i<12;i++)PosTrans[i+10]=cam_result[i];
+                    cv::Mat all_mat=(cv::Mat_<double>(4, 4) << cam_trans[0],cam_trans[1], cam_trans[2],cam_trans[3],
+                                     cam_trans[4],cam_trans[5],cam_trans[6],cam_trans[7],
+                                     cam_trans[8],cam_trans[9],cam_trans[10],cam_trans[11],
+                                     0,0,0,1);
+                    cv::Mat all_mat_inv=all_mat.inv();
+                    cv::Mat all_mat_sel=(cv::Mat_<double>(3, 3) << -all_mat_inv.at<double>(1,0),-all_mat_inv.at<double>(1,1), -all_mat_inv.at<double>(1,3),
+                                         -all_mat_inv.at<double>(2,0),-all_mat_inv.at<double>(2,1),-all_mat_inv.at<double>(2,3),
+                                         all_mat_inv.at<double>(0,0),all_mat_inv.at<double>(0,1),all_mat_inv.at<double>(0,3));
+                    
+                    cv::Mat BallPos=(cv::Mat_<double>(3, 1) << RedBallPosition[0],RedBallPosition[1],1);
+                    
+                    cv::Mat BallPos_World=all_mat_sel.inv()*inner_inv*BallPos;
                     
                     
-                    qiLogInfo("njunaoModule")<<"find the ball, x= "<<PosTrans[0]<<", y= "<<PosTrans[1]<<std::endl;
+                    PosTrans[10]=BallPos_World.at<double>(0,0)/BallPos_World.at<double>(2,0);
+                    PosTrans[11]=BallPos_World.at<double>(1,0)/BallPos_World.at<double>(2,0);
+                    qiLogInfo("vision.njunaoModule")<<"find the ball ("<<PosTrans[10]<<", "<<PosTrans[11]<<")."<<std::endl;
                 }
             }
             fMemProxy.insertData("njunaoBallPosition",PosTrans);
@@ -212,7 +226,7 @@ std::vector<float> njunaoModule::RedBallFind()
 
 void njunaoModule::ContinuousFindBall()
 {
-    std::vector<float> PosTrans(22,0);
+    std::vector<float> PosTrans(12,0);
 
     
     if ((!Detecting)&&RefeshingFlag)
@@ -240,10 +254,23 @@ void njunaoModule::ContinuousFindBall()
                     PosTrans[2]=anglar[0];
                     PosTrans[3]=anglar[1];
                     for (int i=0;i<6;i++)PosTrans[i+4]=cam_result[i];
-                    for (int i=0;i<12;i++)PosTrans[i+10]=cam_result[i];
+                    cv::Mat all_mat=(cv::Mat_<double>(4, 4) << cam_trans[0],cam_trans[1], cam_trans[2],cam_trans[3],
+                                     cam_trans[4],cam_trans[5],cam_trans[6],cam_trans[7],
+                                     cam_trans[8],cam_trans[9],cam_trans[10],cam_trans[11],
+                                     0,0,0,1);
+                    cv::Mat all_mat_inv=all_mat.inv();
+                    cv::Mat all_mat_sel=(cv::Mat_<double>(3, 3) << -all_mat_inv.at<double>(1,0),-all_mat_inv.at<double>(1,1), -all_mat_inv.at<double>(1,3),
+                                         -all_mat_inv.at<double>(2,0),-all_mat_inv.at<double>(2,1),-all_mat_inv.at<double>(2,3),
+                                         all_mat_inv.at<double>(0,0),all_mat_inv.at<double>(0,1),all_mat_inv.at<double>(0,3));
                     
+                    cv::Mat BallPos=(cv::Mat_<double>(3, 1) << RedBallPosition[0],RedBallPosition[1],1);
                     
-                    qiLogInfo("njunaoModule")<<"find the ball, x= "<<PosTrans[0]<<", y= "<<PosTrans[1]<<std::endl;
+                    cv::Mat BallPos_World=all_mat_sel.inv()*inner_inv*BallPos;
+                    
+                   
+                    PosTrans[10]=BallPos_World.at<double>(0,0)/BallPos_World.at<double>(2,0);
+                    PosTrans[11]=BallPos_World.at<double>(1,0)/BallPos_World.at<double>(2,0);
+                    qiLogInfo("vision.njunaoModule")<<"find the ball ("<<PosTrans[10]<<", "<<PosTrans[11]<<")."<<std::endl;
                     
                 }
                 
@@ -321,11 +348,15 @@ void njunaoModule::exit()
 
 void njunaoModule::init()
 {
-    phraseToSay = "this version is 5.1";
+    phraseToSay = "this version is 6.2";
     tts.post.say(phraseToSay);
-    std::vector<float> PosTrans(22,0);
+    std::vector<float> PosTrans(12,0);
     std::vector<float> PolePos(1,0);
-
+    
+    con=(cv::Mat_<double>(4, 1) << -0.0625362260288806,0.0969517251981310, 0.0, 0.0);
+    inner = (cv::Mat_<double>(3, 3) << 562.546487626155 , 0, 331.020749304873, 0, 560.726740317221, 229.930167086478, 0, 0, 1.0000);
+    inner_inv = inner.inv();
+    cv::initUndistortRectifyMap(inner,con,cv::Mat(),inner,cv::Size(640,480),CV_16SC2,map1,map2);
     fMemProxy.insertData("njunaoBallPositionStopFlag",0);
     fMemProxy.insertData("njunaoBallPosition",PosTrans);
     fMemProxy.insertData("njunaoPolePositionStopFlag",0);

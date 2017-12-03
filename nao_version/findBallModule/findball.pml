@@ -8,6 +8,8 @@
     <Dialogs />
     <Resources>
         <File name="" src=".DS_Store" />
+        <File name="behavior2" src="behavior2.xar" />
+        <File name="behavior1" src="behavior1.xar" />
     </Resources>
     <Topics />
     <IgnoredPaths />
