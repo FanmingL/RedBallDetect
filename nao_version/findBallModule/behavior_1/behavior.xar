@@ -162,7 +162,6 @@
         pass
 
     def onInput_onStart(self):
-        self.Mem.insertData("njunaoBallPositionStopFlag",0)
         self.njuModule.registerToVideoDevice(vision_definitions.kVGA, vision_definitions.kBGRColorSpace)
         self.njuModule.post.ContinuousRefreshCam()
         self.njuModule.post.ContinuousFindBall()
