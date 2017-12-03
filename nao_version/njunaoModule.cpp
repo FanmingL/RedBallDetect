@@ -170,7 +170,7 @@ void njunaoModule::RefeshMat()
 std::vector<float> njunaoModule::RedBallFind()
 {
 
-    std::vector<float> PosTrans(12,0);
+    std::vector<float> PosTrans(15,0);
     
     if ((!Detecting)&&RefeshingFlag){
         if (StartDetect)
@@ -178,7 +178,9 @@ std::vector<float> njunaoModule::RedBallFind()
             Detecting=true;
     //       RefeshMat();
             std::vector<float> cam_result = motion.getPosition(fCamProxy->getCameraName(fCamProxy->getActiveCamera()), 0, true);
-            std::vector<float> cam_trans = motion.getTransform(fCamProxy->getCameraName(fCamProxy->getActiveCamera()), 2, true);
+            std::vector<float> cam_trans = motion.getTransform(fCamProxy->getCameraName(fCamProxy->getActiveCamera()), 2,  true);
+            std::vector<float> head_pos =  motion.getAngles("Head", true);
+            
             std::vector<float> RedBallPosition=DetectRedBall(fIplImageHeader);
    
 
@@ -212,6 +214,10 @@ std::vector<float> njunaoModule::RedBallFind()
                     
                     PosTrans[10]=BallPos_World.at<double>(0,0)/BallPos_World.at<double>(2,0);
                     PosTrans[11]=BallPos_World.at<double>(1,0)/BallPos_World.at<double>(2,0);
+                    PosTrans[12]=head_pos[3];
+                    PosTrans[13]=head_pos[4];
+                    PosTrans[14]=head_pos[5];
+                    
                     qiLogInfo("vision.njunaoModule")<<"find the ball ("<<PosTrans[10]<<", "<<PosTrans[11]<<")."<<std::endl;
                 }
             }
@@ -226,7 +232,7 @@ std::vector<float> njunaoModule::RedBallFind()
 
 void njunaoModule::ContinuousFindBall()
 {
-    std::vector<float> PosTrans(12,0);
+    std::vector<float> PosTrans(15,0);
 
     
     if ((!Detecting)&&RefeshingFlag)
@@ -237,6 +243,8 @@ void njunaoModule::ContinuousFindBall()
          //   RefeshMat();
             std::vector<float> cam_result = motion.getPosition(fCamProxy->getCameraName(fCamProxy->getActiveCamera()), 0, true);
             std::vector<float> cam_trans = motion.getTransform(fCamProxy->getCameraName(fCamProxy->getActiveCamera()), 2, true);
+            std::vector<float> head_pos =  motion.getPosition("Head",0, true);
+            
             std::vector<float> RedBallPosition=DetectRedBall(fIplImageHeader);
             
             for (int i=0;i<PosTrans.size();i++)PosTrans[i]=0;
@@ -270,6 +278,10 @@ void njunaoModule::ContinuousFindBall()
                    
                     PosTrans[10]=BallPos_World.at<double>(0,0)/BallPos_World.at<double>(2,0);
                     PosTrans[11]=BallPos_World.at<double>(1,0)/BallPos_World.at<double>(2,0);
+                    PosTrans[12]=head_pos[3];
+                    PosTrans[13]=head_pos[4];
+                    PosTrans[14]=head_pos[5];
+                    
                     qiLogInfo("vision.njunaoModule")<<"find the ball ("<<PosTrans[10]<<", "<<PosTrans[11]<<")."<<std::endl;
                     
                 }
@@ -348,9 +360,9 @@ void njunaoModule::exit()
 
 void njunaoModule::init()
 {
-    phraseToSay = "this version is 6.2";
+    phraseToSay = "this version is 6.4";
     tts.post.say(phraseToSay);
-    std::vector<float> PosTrans(12,0);
+    std::vector<float> PosTrans(15,0);
     std::vector<float> PolePos(1,0);
     
     con=(cv::Mat_<double>(4, 1) << -0.0625362260288806,0.0969517251981310, 0.0, 0.0);
