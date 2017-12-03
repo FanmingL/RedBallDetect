@@ -83,6 +83,7 @@ njunaoModule::~njunaoModule()
         if(fCamProxy)
             fCamProxy->unsubscribe(fVideoClientName);
         if (StartDetect)StartDetect=false;
+        RefeshingFlag=false;
         fCamProxy.reset();
     }
     catch(const AL::ALError& e)
@@ -121,7 +122,7 @@ void njunaoModule::registerToVideoDevice(const int &pResolution, const int &pCol
 void njunaoModule::unRegisterFromVideoDevice()
 {
     StartDetect=false;
-    fRegisteredToVideoDevice = false;
+    
     RefeshingFlag=false;
     usleep(100000);
     if (!fIplImageHeader.empty())
@@ -130,6 +131,7 @@ void njunaoModule::unRegisterFromVideoDevice()
     if (!fRegisteredToVideoDevice) {return;}
     if(fCamProxy)
         fCamProxy->unsubscribe(fVideoClientName);
+    fRegisteredToVideoDevice = false;
 
 }
 
@@ -292,7 +294,7 @@ void njunaoModule::exit()
 
 void njunaoModule::init()
 {
-    phraseToSay = "this version is 4.1";
+    phraseToSay = "this version is 4.2";
     tts.post.say(phraseToSay);
     std::vector<float> PosTrans;
     std::vector<float> PolePos;

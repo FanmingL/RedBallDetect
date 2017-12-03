@@ -17,7 +17,7 @@
             <BehaviorLayer name="behavior_layer1">
                 <BehaviorKeyframe name="keyframe1" index="1">
                     <Diagram>
-                        <Box name="findBallNew" id="2" localization="8" tooltip="" x="222" y="7">
+                        <Box name="findBallNew" id="2" localization="8" tooltip="" x="222" y="2">
                             <bitmap>media/images/box/box-python-script.png</bitmap>
                             <script language="4">
                                 <content>
@@ -38,7 +38,7 @@
         pass
 
     def onInput_onStart(self):
-        self.Mem.insertData("njunaoBallPositionStopFlag",0)
+        self.njuModule.unRegisterFromVideoDevice()
         self.njuModule.registerToVideoDevice(vision_definitions.kVGA, vision_definitions.kBGRColorSpace)
         self.njuModule.post.ContinuousRefreshCam()
         self.njuModule.post.ContinuousFindBall()
@@ -57,7 +57,7 @@
                             <Input name="onStop" type="1" type_size="1" nature="3" inner="0" tooltip="Box behavior stops when a signal is received on this input." id="3" />
                             <Output name="onStopped" type="1" type_size="1" nature="1" inner="0" tooltip="指令盒行为结束时，送出信号。" id="4" />
                         </Box>
-                        <Box name="endFind" id="3" localization="8" tooltip="" x="696" y="5">
+                        <Box name="endFind" id="3" localization="8" tooltip="" x="816" y="11">
                             <bitmap>media/images/box/box-python-script.png</bitmap>
                             <script language="4">
                                 <content>
@@ -107,7 +107,7 @@
                                 <BehaviorLayer name="behavior_layer1">
                                     <BehaviorKeyframe name="keyframe1" index="1">
                                         <Diagram>
-                                            <Box name="selectcam" id="3" localization="8" tooltip="" x="255" y="24">
+                                            <Box name="selectcam" id="3" localization="8" tooltip="" x="202" y="33">
                                                 <bitmap>media/images/box/box-python-script.png</bitmap>
                                                 <script language="4">
                                                     <content>
@@ -566,7 +566,7 @@
                             <Output name="yaw" type="1" type_size="1" nature="2" inner="0" tooltip="" id="7" />
                             <Output name="switch" type="1" type_size="1" nature="1" inner="0" tooltip="" id="8" />
                         </Box>
-                        <Box name="judge" id="8" localization="8" tooltip="" x="171" y="149">
+                        <Box name="judge" id="8" localization="8" tooltip="" x="185" y="235">
                             <bitmap>media/images/box/box-python-script.png</bitmap>
                             <script language="4">
                                 <content>
@@ -631,7 +631,7 @@
                             <Input name="onStart" type="0" type_size="1" nature="1" inner="0" tooltip="Box behavior starts when a signal is received on this input." id="2" />
                             <Output name="onStopped" type="0" type_size="1" nature="2" inner="0" tooltip="指令盒行为结束时，送出信号。" id="3" />
                         </Box>
-                        <Box name="Stand Up (1)" id="11" localization="8" tooltip="the robot tries to stand up from any position for a number of tries.&#x0A;&#x0A;Note: The number of tries can be set in parameters." x="86" y="9">
+                        <Box name="Stand Up (1)" id="11" localization="8" tooltip="the robot tries to stand up from any position for a number of tries.&#x0A;&#x0A;Note: The number of tries can be set in parameters." x="81" y="25">
                             <bitmap>media/images/box/movement/stand.png</bitmap>
                             <script language="4">
                                 <content>
