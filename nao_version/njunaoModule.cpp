@@ -316,10 +316,8 @@ std::vector<float> njunaoModule::PoleFind()
             std::vector<float> PolePos_temp=DetectPole(fIplImageHeader);
             if (!(PolePos_temp[0]==0))
             {
-                PolePos_temp[0]=PolePos_temp[0]/(1.0f*imgWidth);
-                PolePos_temp[1]=PolePos_temp[1]/(1.0f*imgHeight);
-                PolePos[0]=PolePos_temp[0];
-                PolePos[1]=PolePos_temp[1];
+                PolePos[0]=PolePos_temp[0]/(1.0f*imgWidth);
+                PolePos[1]=PolePos_temp[1]/(1.0f*imgHeight);
                 for (int i=0;i<6;i++)PolePos[2+i]=cam_result[i];
                 PolePos[8]=head_pos[3];
                 PolePos[9]=head_pos[4];
@@ -364,8 +362,8 @@ void njunaoModule::ContinuousFindPole()
             for (int i=0;i<PolePos.size();i++)PolePos[i]=0;
             if (!(PolePos_temp[0]==0))
             {
-                PolePos_temp[0]=PolePos_temp[0]/(1.0f*imgWidth);
-                PolePos_temp[1]=PolePos_temp[1]/(1.0f*imgHeight);
+                PolePos[0]=PolePos_temp[0]/(1.0f*imgWidth);
+                PolePos[1]=PolePos_temp[1]/(1.0f*imgHeight);
                 PolePos[0]=PolePos_temp[0];
                 PolePos[1]=PolePos_temp[1];
                 for (int i=0;i<6;i++)PolePos[2+i]=cam_result[i];
