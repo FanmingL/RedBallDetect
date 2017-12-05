@@ -187,6 +187,7 @@
                         </Box>
                         <Link inputowner="16" indexofinput="3" outputowner="0" indexofoutput="2" />
                         <Link inputowner="0" indexofinput="6" outputowner="3" indexofoutput="4" />
+                        <Link inputowner="15" indexofinput="3" outputowner="0" indexofoutput="5" />
                     </Diagram>
                 </BehaviorKeyframe>
             </BehaviorLayer>

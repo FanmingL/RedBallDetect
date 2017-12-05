@@ -364,8 +364,6 @@ void njunaoModule::ContinuousFindPole()
             {
                 PolePos[0]=PolePos_temp[0]/(1.0f*imgWidth);
                 PolePos[1]=PolePos_temp[1]/(1.0f*imgHeight);
-                PolePos[0]=PolePos_temp[0];
-                PolePos[1]=PolePos_temp[1];
                 for (int i=0;i<6;i++)PolePos[2+i]=cam_result[i];
                 PolePos[8]=head_pos[3];
                 PolePos[9]=head_pos[4];
@@ -407,7 +405,7 @@ void njunaoModule::exit()
 
 void njunaoModule::init()
 {
-    phraseToSay = "this version is 6.6";
+    phraseToSay = "this version is 7.0";
     tts.post.say(phraseToSay);
     std::vector<float> PosTrans(15,0);
     std::vector<float> PolePos(13,0);
