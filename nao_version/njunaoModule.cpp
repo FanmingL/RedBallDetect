@@ -171,19 +171,18 @@ std::vector<float> njunaoModule::RedBallFind()
 {
 
     std::vector<float> PosTrans(15,0);
-    
-    if ((!Detecting)&&RefeshingFlag){
+    if ((!Detecting)&&RefeshingFlag)
+    {
         if (StartDetect)
         {
             Detecting=true;
-    //       RefeshMat();
             std::vector<float> cam_result = motion.getPosition(fCamProxy->getCameraName(fCamProxy->getActiveCamera()), 0, true);
-            std::vector<float> cam_trans = motion.getTransform(fCamProxy->getCameraName(fCamProxy->getActiveCamera()), 2,  true);
-            std::vector<float> head_pos =  motion.getAngles("Head", true);
+            std::vector<float> cam_trans = motion.getTransform(fCamProxy->getCameraName(fCamProxy->getActiveCamera()), 2, true);
+            std::vector<float> head_pos =  motion.getPosition("Head",0, true);
             
             std::vector<float> RedBallPosition=DetectRedBall(fIplImageHeader);
-   
-
+            
+            for (int i=0;i<PosTrans.size();i++)PosTrans[i]=0;
             if (!(RedBallPosition[0]==0&&RedBallPosition[1]==0&&RedBallPosition[2]==0))
             {
                 if (!(imgWidth==0||imgHeight==0))
@@ -219,13 +218,17 @@ std::vector<float> njunaoModule::RedBallFind()
                     PosTrans[14]=head_pos[5];
                     
                     qiLogInfo("vision.njunaoModule")<<"find the ball ("<<PosTrans[10]<<", "<<PosTrans[11]<<")."<<std::endl;
+                    
                 }
+                
             }
             fMemProxy.insertData("njunaoBallPosition",PosTrans);
             fMemProxy.raiseEvent("njuFindBall",PosTrans);
         }
         Detecting=false;
+        
     }
+    
 
     return PosTrans;
 }
@@ -240,7 +243,6 @@ void njunaoModule::ContinuousFindBall()
         while (StartDetect)
         {
             Detecting=true;
-         //   RefeshMat();
             std::vector<float> cam_result = motion.getPosition(fCamProxy->getCameraName(fCamProxy->getActiveCamera()), 0, true);
             std::vector<float> cam_trans = motion.getTransform(fCamProxy->getCameraName(fCamProxy->getActiveCamera()), 2, true);
             std::vector<float> head_pos =  motion.getPosition("Head",0, true);
@@ -291,8 +293,6 @@ void njunaoModule::ContinuousFindBall()
             fMemProxy.raiseEvent("njuFindBall",PosTrans);
             if (fMemProxy.getData("njunaoBallPositionStopFlag"))
             {
-               // unRegisterFromVideoDevice();
-                //exit();
                 break;
             }
         }
@@ -304,17 +304,43 @@ void njunaoModule::ContinuousFindBall()
 
 std::vector<float> njunaoModule::PoleFind()
 {
-    std::vector<float> PolePos;
+    std::vector<float> PolePos(13,0);
     
-    PolePos.push_back(0);
     if (!PoleDetecting){
         PoleDetecting=true;
+        
         if (StartDetect&&RefeshingFlag){
-          //  RefeshMat();
-            PolePos=DetectPole(fIplImageHeader);
-            if (!(PolePos[0]==0))
+            std::vector<float> cam_result = motion.getPosition(fCamProxy->getCameraName(fCamProxy->getActiveCamera()), 0, true);
+            std::vector<float> head_pos =  motion.getPosition("Head",0, true);
+            std::vector<float> cam_trans = motion.getTransform(fCamProxy->getCameraName(fCamProxy->getActiveCamera()), 2, true);
+            std::vector<float> PolePos_temp=DetectPole(fIplImageHeader);
+            if (!(PolePos_temp[0]==0))
             {
-                PolePos[0]=PolePos[0]/(1.0f*imgWidth);
+                PolePos_temp[0]=PolePos_temp[0]/(1.0f*imgWidth);
+                PolePos_temp[1]=PolePos_temp[1]/(1.0f*imgHeight);
+                PolePos[0]=PolePos_temp[0];
+                PolePos[1]=PolePos_temp[1];
+                for (int i=0;i<6;i++)PolePos[2+i]=cam_result[i];
+                PolePos[8]=head_pos[3];
+                PolePos[9]=head_pos[4];
+                PolePos[10]=head_pos[5];
+                
+                cv::Mat all_mat=(cv::Mat_<double>(4, 4) << cam_trans[0],cam_trans[1], cam_trans[2],cam_trans[3],
+                                 cam_trans[4],cam_trans[5],cam_trans[6],cam_trans[7],
+                                 cam_trans[8],cam_trans[9],cam_trans[10],cam_trans[11],
+                                 0,0,0,1);
+                cv::Mat all_mat_inv=all_mat.inv();
+                cv::Mat all_mat_sel=(cv::Mat_<double>(3, 3) << -all_mat_inv.at<double>(1,0),-all_mat_inv.at<double>(1,1), -all_mat_inv.at<double>(1,3),
+                                     -all_mat_inv.at<double>(2,0),-all_mat_inv.at<double>(2,1),-all_mat_inv.at<double>(2,3),
+                                     all_mat_inv.at<double>(0,0),all_mat_inv.at<double>(0,1),all_mat_inv.at<double>(0,3));
+                
+                cv::Mat PolePos_mat=(cv::Mat_<double>(3, 1) << PolePos_temp[0],PolePos_temp[1],1);
+                
+                cv::Mat BallPos_World=all_mat_sel.inv()*inner_inv*PolePos_mat;
+                
+                
+                PolePos[11]=(float)(BallPos_World.at<double>(0,0)/BallPos_World.at<double>(2,0));
+                PolePos[12]=(float)(BallPos_World.at<double>(1,0)/BallPos_World.at<double>(2,0));
             }
             fMemProxy.insertData("njunaoPolePosition",PolePos);
             fMemProxy.raiseEvent("njuFindPole",PolePos);
@@ -326,25 +352,48 @@ std::vector<float> njunaoModule::PoleFind()
 
 void njunaoModule::ContinuousFindPole()
 {
-    std::vector<float> PolePos;
-    PolePos.push_back(0);
+    std::vector<float> PolePos(13,0);
     if (!PoleDetecting){
         PoleDetecting=true;
         while (StartDetect&&RefeshingFlag){
-            PoleDetecting=true;
-           // RefeshMat();
-            PolePos=DetectPole(fIplImageHeader);
-            if (PolePos[0])
+            
+            std::vector<float> cam_result = motion.getPosition(fCamProxy->getCameraName(fCamProxy->getActiveCamera()), 0, true);
+            std::vector<float> head_pos =  motion.getPosition("Head",0, true);
+            std::vector<float> cam_trans = motion.getTransform(fCamProxy->getCameraName(fCamProxy->getActiveCamera()), 2, true);
+            std::vector<float> PolePos_temp=DetectPole(fIplImageHeader);
+            for (int i=0;i<PolePos.size();i++)PolePos[i]=0;
+            if (!(PolePos_temp[0]==0))
             {
-                PolePos[0]=PolePos[0]/(1.0f*imgWidth);
-                qiLogInfo("njunaoModule")<<"find the pole, x= "<<PolePos[0]<<std::endl;
+                PolePos_temp[0]=PolePos_temp[0]/(1.0f*imgWidth);
+                PolePos_temp[1]=PolePos_temp[1]/(1.0f*imgHeight);
+                PolePos[0]=PolePos_temp[0];
+                PolePos[1]=PolePos_temp[1];
+                for (int i=0;i<6;i++)PolePos[2+i]=cam_result[i];
+                PolePos[8]=head_pos[3];
+                PolePos[9]=head_pos[4];
+                PolePos[10]=head_pos[5];
+                
+                cv::Mat all_mat=(cv::Mat_<double>(4, 4) << cam_trans[0],cam_trans[1], cam_trans[2],cam_trans[3],
+                                 cam_trans[4],cam_trans[5],cam_trans[6],cam_trans[7],
+                                 cam_trans[8],cam_trans[9],cam_trans[10],cam_trans[11],
+                                 0,0,0,1);
+                cv::Mat all_mat_inv=all_mat.inv();
+                cv::Mat all_mat_sel=(cv::Mat_<double>(3, 3) << -all_mat_inv.at<double>(1,0),-all_mat_inv.at<double>(1,1), -all_mat_inv.at<double>(1,3),
+                                     -all_mat_inv.at<double>(2,0),-all_mat_inv.at<double>(2,1),-all_mat_inv.at<double>(2,3),
+                                     all_mat_inv.at<double>(0,0),all_mat_inv.at<double>(0,1),all_mat_inv.at<double>(0,3));
+                
+                cv::Mat PolePos_mat=(cv::Mat_<double>(3, 1) << PolePos_temp[0],PolePos_temp[1],1);
+                
+                cv::Mat BallPos_World=all_mat_sel.inv()*inner_inv*PolePos_mat;
+                
+                
+                PolePos[11]=(float)(BallPos_World.at<double>(0,0)/BallPos_World.at<double>(2,0));
+                PolePos[12]=(float)(BallPos_World.at<double>(1,0)/BallPos_World.at<double>(2,0));
             }
             fMemProxy.insertData("njunaoPolePosition",PolePos);
             fMemProxy.raiseEvent("njuFindPole",PolePos);
             if (fMemProxy.getData("njunaoPolePositionStopFlag"))
             {
-                //unRegisterFromVideoDevice();
-                //exit();
                 break;
             }
         }
@@ -360,10 +409,10 @@ void njunaoModule::exit()
 
 void njunaoModule::init()
 {
-    phraseToSay = "this version is 6.4";
+    phraseToSay = "this version is 6.6";
     tts.post.say(phraseToSay);
     std::vector<float> PosTrans(15,0);
-    std::vector<float> PolePos(1,0);
+    std::vector<float> PolePos(13,0);
     
     con=(cv::Mat_<double>(4, 1) << -0.0625362260288806,0.0969517251981310, 0.0, 0.0);
     inner = (cv::Mat_<double>(3, 3) << 562.546487626155 , 0, 331.020749304873, 0, 560.726740317221, 229.930167086478, 0, 0, 1.0000);
