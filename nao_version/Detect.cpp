@@ -23,12 +23,11 @@ std::vector<float> DetectRedBall(cv::Mat &originalImage){
     cv::Mat GreenSpace,GreenSpaceII;
     cv::cvtColor(originalImage, GreenSpace, CV_BGR2GRAY);
 #endif
-    cv::Mat YUV_Image;
-    cv::cvtColor(originalImage, YUV_Image, CV_BGR2YUV);
-    std::vector<cv::Mat> yuvChannels;
-    cv::split(YUV_Image, yuvChannels);
-    cv::Mat U_channel=yuvChannels[1];
-    cv::Mat YUV_REDMASK=U_channel>150;
+//    cv::Mat YUV_Image;
+//    cv::cvtColor(originalImage, YUV_Image, CV_BGR2YUV);
+//    std::vector<cv::Mat> yuvChannels;
+//    cv::split(YUV_Image, yuvChannels);
+//    cv::Mat YUV_REDMASK=(yuvChannels[1]>170);
     
     cv::Mat element;
     std::vector<cv::Mat> hsvChannels;
@@ -72,7 +71,7 @@ std::vector<float> DetectRedBall(cv::Mat &originalImage){
     GreenMask.copyTo(GreenMaskFiltered);
     element=cv::getStructuringElement(cv::MORPH_RECT,cv::Size(2*40+1,2*40+1));
     cv::morphologyEx(GreenMaskFiltered,GreenMaskFiltered,cv::MORPH_CLOSE,element);
-    OutMask=RedMask&GreenMaskFiltered&YUV_REDMASK;
+    OutMask=RedMask&GreenMaskFiltered;
     element=cv::getStructuringElement(cv::MORPH_ELLIPSE,cv::Size(2*1+1,2*1+1));
     cv::morphologyEx(OutMask,OutMaskFiltered,cv::MORPH_OPEN,element);
     OutMaskFiltered.copyTo(MaskToFindContour);
