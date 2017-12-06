@@ -18,10 +18,6 @@
    <nature>interactive</nature>
    <permissions/>
   </behaviorContent>
-  <behaviorContent path="hhhh">
-   <nature>interactive</nature>
-   <permissions/>
-  </behaviorContent>
   <behaviorContent path="go straight to ball">
    <nature>interactive</nature>
    <permissions/>

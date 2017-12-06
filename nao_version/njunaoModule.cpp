@@ -420,7 +420,7 @@ void njunaoModule::exit()
 
 void njunaoModule::init()
 {
-    phraseToSay = "this version is 7.2";
+    phraseToSay = "this version is 7.3";
     tts.post.say(phraseToSay);
     std::vector<float> PosTrans(15,0);
     std::vector<float> PolePos(15,0);
