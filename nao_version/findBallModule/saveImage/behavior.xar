@@ -15,7 +15,7 @@
             <BehaviorLayer name="behavior_layer1">
                 <BehaviorKeyframe name="keyframe1" index="1">
                     <Diagram>
-                        <Box name="selectcam" id="16" localization="8" tooltip="" x="59" y="52">
+                        <Box name="selectcam" id="16" localization="8" tooltip="" x="83" y="16">
                             <bitmap>media/images/box/box-diagram.png</bitmap>
                             <script language="4">
                                 <content>
@@ -139,7 +139,7 @@
                             <Input name="camup" type="1" type_size="1" nature="2" inner="0" tooltip="Box behavior starts when a signal is received on this input." id="2" />
                             <Output name="onStopped" type="1" type_size="1" nature="1" inner="0" tooltip="指令盒行为结束时，送出信号。" id="3" />
                         </Box>
-                        <Box name="endFind" id="1" localization="8" tooltip="" x="460" y="123">
+                        <Box name="endFind" id="1" localization="8" tooltip="" x="451" y="37">
                             <bitmap>media/images/box/box-python-script.png</bitmap>
                             <script language="4">
                                 <content>
@@ -176,6 +176,7 @@
                         </Box>
                         <Link inputowner="16" indexofinput="3" outputowner="0" indexofoutput="2" />
                         <Link inputowner="3" indexofinput="2" outputowner="16" indexofoutput="4" />
+                        <Link inputowner="0" indexofinput="4" outputowner="1" indexofoutput="4" />
                     </Diagram>
                 </BehaviorKeyframe>
             </BehaviorLayer>
