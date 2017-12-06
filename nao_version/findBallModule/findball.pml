@@ -8,6 +8,7 @@
         <BehaviorDescription name="behavior" src="hhhh" xar="behavior.xar" />
         <BehaviorDescription name="behavior" src="go straight to ball" xar="behavior.xar" />
         <BehaviorDescription name="behavior" src="find ball and pole" xar="behavior.xar" />
+        <BehaviorDescription name="behavior" src="saveImage" xar="behavior.xar" />
     </BehaviorDescriptions>
     <Dialogs />
     <Resources>

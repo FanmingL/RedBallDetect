@@ -63,7 +63,7 @@ std::vector<float> DetectRedBall(cv::Mat &originalImage){
 //        cv::drawContours(GreenMaskFiltered, contours, SecondMaxAreaIndex, cv::Scalar(255,255,255), -1);
 //    }
     GreenMask.copyTo(GreenMaskFiltered);
-    element=cv::getStructuringElement(cv::MORPH_RECT,cv::Size(2*55+1,2*55+1));
+    element=cv::getStructuringElement(cv::MORPH_RECT,cv::Size(2*40+1,2*40+1));
     cv::morphologyEx(GreenMaskFiltered,GreenMaskFiltered,cv::MORPH_CLOSE,element);
     OutMask=RedMask&GreenMaskFiltered;
     element=cv::getStructuringElement(cv::MORPH_ELLIPSE,cv::Size(2*1+1,2*1+1));
