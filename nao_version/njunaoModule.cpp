@@ -304,7 +304,7 @@ void njunaoModule::ContinuousFindBall()
 
 std::vector<float> njunaoModule::PoleFind()
 {
-    std::vector<float> PolePos(13,0);
+    std::vector<float> PolePos(15,0);
     
     if (!PoleDetecting){
         PoleDetecting=true;
@@ -339,6 +339,14 @@ std::vector<float> njunaoModule::PoleFind()
                 
                 PolePos[11]=(float)(BallPos_World.at<double>(0,0)/BallPos_World.at<double>(2,0));
                 PolePos[12]=(float)(BallPos_World.at<double>(1,0)/BallPos_World.at<double>(2,0));
+                std::vector<float> _temp;
+                _temp.push_back(PolePos[0]);
+                _temp.push_back(PolePos[1]);
+                std::vector<float> anglar=fCamProxy->getAngularPositionFromImagePosition(fCamProxy->getActiveCamera(),_temp);
+                PolePos[13]=anglar[0];
+                PolePos[14]=anglar[1];
+                
+                
             }
             fMemProxy.insertData("njunaoPolePosition",PolePos);
             fMemProxy.raiseEvent("njuFindPole",PolePos);
@@ -350,7 +358,7 @@ std::vector<float> njunaoModule::PoleFind()
 
 void njunaoModule::ContinuousFindPole()
 {
-    std::vector<float> PolePos(13,0);
+    std::vector<float> PolePos(15,0);
     if (!PoleDetecting){
         PoleDetecting=true;
         while (StartDetect&&RefeshingFlag){
@@ -385,6 +393,13 @@ void njunaoModule::ContinuousFindPole()
                 
                 PolePos[11]=(float)(BallPos_World.at<double>(0,0)/BallPos_World.at<double>(2,0));
                 PolePos[12]=(float)(BallPos_World.at<double>(1,0)/BallPos_World.at<double>(2,0));
+                
+                std::vector<float> _temp;
+                _temp.push_back(PolePos[0]);
+                _temp.push_back(PolePos[1]);
+                std::vector<float> anglar=fCamProxy->getAngularPositionFromImagePosition(fCamProxy->getActiveCamera(),_temp);
+                PolePos[13]=anglar[0];
+                PolePos[14]=anglar[1];
             }
             fMemProxy.insertData("njunaoPolePosition",PolePos);
             fMemProxy.raiseEvent("njuFindPole",PolePos);
@@ -405,10 +420,10 @@ void njunaoModule::exit()
 
 void njunaoModule::init()
 {
-    phraseToSay = "this version is 7.0";
+    phraseToSay = "this version is 7.1";
     tts.post.say(phraseToSay);
     std::vector<float> PosTrans(15,0);
-    std::vector<float> PolePos(13,0);
+    std::vector<float> PolePos(15,0);
     
     con=(cv::Mat_<double>(4, 1) << -0.0625362260288806,0.0969517251981310, 0.0, 0.0);
     inner = (cv::Mat_<double>(3, 3) << 562.546487626155 , 0, 331.020749304873, 0, 560.726740317221, 229.930167086478, 0, 0, 1.0000);

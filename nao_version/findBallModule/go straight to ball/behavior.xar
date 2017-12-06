@@ -280,7 +280,14 @@
         GeneratedClass.__init__(self)
     def interval_theta(self,theta):
         if (((theta/2.0>0.05) ) or (theta/2.0<-0.05)):
-            return(theta/2.0)
+            if ((theta/2.0>0.5)):
+                return(0.5)
+            elif((theta>0)):
+                return(theta/2.0)
+            elif((theta/2.0<-0.5)):
+                return(-0.5)
+            elif((theta<0)):
+                return(theta/2.0)
         elif(theta>0):
             return(0.05)
         elif(theta<0):
