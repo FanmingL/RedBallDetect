@@ -10,10 +10,6 @@
   <language>en_US</language>
  </descriptionLanguages>
  <contents>
-  <behaviorContent path="behavior_1">
-   <nature>interactive</nature>
-   <permissions/>
-  </behaviorContent>
   <behaviorContent path="hhh">
    <nature>interactive</nature>
    <permissions/>
@@ -27,6 +23,10 @@
    <permissions/>
   </behaviorContent>
   <behaviorContent path="saveImage">
+   <nature>interactive</nature>
+   <permissions/>
+  </behaviorContent>
+  <behaviorContent path="close the camera">
    <nature>interactive</nature>
    <permissions/>
   </behaviorContent>

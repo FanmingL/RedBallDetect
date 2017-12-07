@@ -123,11 +123,11 @@ void njunaoModule::registerToVideoDevice(const int &pResolution, const int &pCol
 void njunaoModule::unRegisterFromVideoDevice()
 {
     StartDetect=false;
-    
     RefeshingFlag=false;
-    usleep(100000);
+    usleep(300000);
     if (!fIplImageHeader.empty())
         fIplImageHeader.release();
+    
     qiLogInfo("njunaoModule") << "try to unregister " << fVideoClientName << " module." << std::endl;
     if (!fRegisteredToVideoDevice) {return;}
     if(fCamProxy)
@@ -420,7 +420,7 @@ void njunaoModule::exit()
 
 void njunaoModule::init()
 {
-    phraseToSay = "this version is 7.3";
+    phraseToSay = "this version is 7.4";
     tts.post.say(phraseToSay);
     std::vector<float> PosTrans(15,0);
     std::vector<float> PolePos(15,0);
