@@ -26,7 +26,8 @@ std::vector<float> DetectPole(cv::Mat &originalImage)
     originalImage.copyTo(LineImage);
     cv::cvtColor(originalImage, hsvImage, CV_BGR2HSV);
     cv::split(hsvImage, hsv);
-    yellowMask=((hsv[0]>20)&(hsv[0]<34)&(hsv[1]>80));
+    //yellowMask=((hsv[0]>20)&(hsv[0]<34)&(hsv[1]>80));//nju
+    yellowMask=((hsv[0]>25)&(hsv[0]<31)&(hsv[1]>150));//nst
     
     element=cv::getStructuringElement(cv::MORPH_CROSS,cv::Size(4,4));
     cv::morphologyEx(yellowMask,yellowMaskFiltered,cv::MORPH_CLOSE,element);
