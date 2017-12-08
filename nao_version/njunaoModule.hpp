@@ -158,6 +158,8 @@ private:
     
     cv::Mat inner_inv;
     
+    std::vector<float> cam_result_global,cam_trans_global,head_pos_global;
+    
 
 };
 #endif

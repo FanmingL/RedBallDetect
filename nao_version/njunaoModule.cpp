@@ -154,6 +154,7 @@ void njunaoModule::RefeshMat()
     if (!imageIn) {
         throw ALError(getName(), "saveImageLocal", "Invalid image returned.");
     }
+    cv::Mat fimage_temp=fIplImageHeader;
     // You can get some image information that you may find useful.
     //const int width = imageIn->fWidth;
     //const int height = imageIn->fHeight;
@@ -161,7 +162,8 @@ void njunaoModule::RefeshMat()
     //const int colorSpace = imageIn->fColorSpace;
     //const long long timeStamp = imageIn->getTimeStamp();
     //const int seconds = (int)(timeStamp/1000000LL);
-    fIplImageHeader.data = imageIn->getData();
+    fimage_temp.data = imageIn->getData();
+    fimage_temp.copyTo(fIplImageHeader);
     cv::remap(fIplImageHeader,fIplImageHeader,map1,map2,cv::INTER_LINEAR);
     fCamProxy->releaseImage(fVideoClientName);
     zyFlag=false;
@@ -176,9 +178,9 @@ std::vector<float> njunaoModule::RedBallFind()
         if (StartDetect)
         {
             Detecting=true;
-            std::vector<float> cam_result = motion.getPosition(fCamProxy->getCameraName(fCamProxy->getActiveCamera()), 0, true);
-            std::vector<float> cam_trans = motion.getTransform(fCamProxy->getCameraName(fCamProxy->getActiveCamera()), 2, true);
-            std::vector<float> head_pos =  motion.getPosition("Head",0, true);
+            std::vector<float> cam_result = cam_result_global;
+            std::vector<float> head_pos =  head_pos_global;
+            std::vector<float> cam_trans = cam_trans_global;
             
             std::vector<float> RedBallPosition=DetectRedBall(fIplImageHeader);
             
@@ -243,9 +245,9 @@ void njunaoModule::ContinuousFindBall()
         while (StartDetect)
         {
             Detecting=true;
-            std::vector<float> cam_result = motion.getPosition(fCamProxy->getCameraName(fCamProxy->getActiveCamera()), 0, true);
-            std::vector<float> cam_trans = motion.getTransform(fCamProxy->getCameraName(fCamProxy->getActiveCamera()), 2, true);
-            std::vector<float> head_pos =  motion.getPosition("Head",0, true);
+            std::vector<float> cam_result = cam_result_global;
+            std::vector<float> head_pos =  head_pos_global;
+            std::vector<float> cam_trans = cam_trans_global;
             
             std::vector<float> RedBallPosition=DetectRedBall(fIplImageHeader);
             
@@ -310,9 +312,9 @@ std::vector<float> njunaoModule::PoleFind()
         PoleDetecting=true;
         
         if (StartDetect&&RefeshingFlag){
-            std::vector<float> cam_result = motion.getPosition(fCamProxy->getCameraName(fCamProxy->getActiveCamera()), 0, true);
-            std::vector<float> head_pos =  motion.getPosition("Head",0, true);
-            std::vector<float> cam_trans = motion.getTransform(fCamProxy->getCameraName(fCamProxy->getActiveCamera()), 2, true);
+            std::vector<float> cam_result = cam_result_global;
+            std::vector<float> head_pos =  head_pos_global;
+            std::vector<float> cam_trans = cam_trans_global;
             std::vector<float> PolePos_temp=DetectPole(fIplImageHeader);
             if (!(PolePos_temp[0]==0))
             {
@@ -363,9 +365,9 @@ void njunaoModule::ContinuousFindPole()
         PoleDetecting=true;
         while (StartDetect&&RefeshingFlag){
             
-            std::vector<float> cam_result = motion.getPosition(fCamProxy->getCameraName(fCamProxy->getActiveCamera()), 0, true);
-            std::vector<float> head_pos =  motion.getPosition("Head",0, true);
-            std::vector<float> cam_trans = motion.getTransform(fCamProxy->getCameraName(fCamProxy->getActiveCamera()), 2, true);
+            std::vector<float> cam_result = cam_result_global;
+            std::vector<float> head_pos =  head_pos_global;
+            std::vector<float> cam_trans = cam_trans_global;
             std::vector<float> PolePos_temp=DetectPole(fIplImageHeader);
             for (int i=0;i<PolePos.size();i++)PolePos[i]=0;
             if (!(PolePos_temp[0]==0))
@@ -420,7 +422,7 @@ void njunaoModule::exit()
 
 void njunaoModule::init()
 {
-    phraseToSay = "this version is 7.4";
+    phraseToSay = "this version is 7.5";
     tts.post.say(phraseToSay);
     std::vector<float> PosTrans(15,0);
     std::vector<float> PolePos(15,0);
@@ -463,6 +465,9 @@ void njunaoModule::ContinuousRefreshCam()
     while (RefeshingFlag)
     {
         RefeshMat();
+        cam_result_global = motion.getPosition(fCamProxy->getCameraName(fCamProxy->getActiveCamera()), 0, true);
+        cam_trans_global = motion.getTransform(fCamProxy->getCameraName(fCamProxy->getActiveCamera()), 2, true);
+        head_pos_global =  motion.getPosition("Head",0, true);
 
         usleep(60000);
       //  if (expect_camera!=fCamProxy->getActiveCamera())
