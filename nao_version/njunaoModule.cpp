@@ -110,6 +110,9 @@ void njunaoModule::registerToVideoDevice(const int &pResolution, const int &pCol
     imgNbLayers = getNumLayersInColorSpace(pColorSpace);
     type = (imgNbLayers) == 3 ? CV_8UC3 : CV_8UC1;
     fIplImageHeader = cv::Mat(cv::Size(imgWidth, imgHeight), type);
+    //fCamProxy->setParameter(fCamProxy->getActiveCamera(),11,0);
+    fCamProxy->setParameter(fCamProxy->getActiveCamera(),12,0);
+    fCamProxy->setParameter(fCamProxy->getActiveCamera(),13,0);
     if(fCamProxy)
         fVideoClientName = fCamProxy->subscribe(kOriginalName, pResolution, pColorSpace, kFps );
     qiLogInfo("njunaoModule") << "Module registered as " << fVideoClientName << std::endl;
@@ -154,7 +157,8 @@ void njunaoModule::RefeshMat()
     if (!imageIn) {
         throw ALError(getName(), "saveImageLocal", "Invalid image returned.");
     }
-    cv::Mat fimage_temp=fIplImageHeader;
+    cv::Mat fimage_temp;
+    fIplImageHeader.copyTo(fimage_temp);
     // You can get some image information that you may find useful.
     //const int width = imageIn->fWidth;
     //const int height = imageIn->fHeight;
@@ -422,7 +426,7 @@ void njunaoModule::exit()
 
 void njunaoModule::init()
 {
-    phraseToSay = "this version is 7.5";
+    phraseToSay = "this version is 7.8";
     tts.post.say(phraseToSay);
     std::vector<float> PosTrans(15,0);
     std::vector<float> PolePos(15,0);
