@@ -33,10 +33,10 @@ std::vector<float> DetectRedBall(cv::Mat &originalImage){
     std::vector<cv::Mat> hsvChannels;
     cv::cvtColor(originalImage, hsvImage, CV_BGR2HSV);
     cv::split(hsvImage, hsvChannels);
- //   RedMask=((hsvChannels[0]>=0)&(hsvChannels[0]<20)|(hsvChannels[0]>175))&(hsvChannels[1]>155);
-  //  GreenMask=(hsvChannels[0]>37)&(hsvChannels[0]<70)&(hsvChannels[1]>80);//nju
-    RedMask=((hsvChannels[0]>=0)&(hsvChannels[0]<8)|(hsvChannels[0]>172))&(hsvChannels[1]>120);
-    GreenMask=(hsvChannels[0]>70)&(hsvChannels[0]<80)&(hsvChannels[1]>100);//nst
+    RedMask=((hsvChannels[0]>=0)&(hsvChannels[0]<20)|(hsvChannels[0]>175))&(hsvChannels[1]>155);
+    GreenMask=(hsvChannels[0]>37)&(hsvChannels[0]<70)&(hsvChannels[1]>80);//nju
+  //  RedMask=((hsvChannels[0]>=0)&(hsvChannels[0]<8)|(hsvChannels[0]>172))&(hsvChannels[1]>120);
+  //  GreenMask=(hsvChannels[0]>70)&(hsvChannels[0]<85)&(hsvChannels[1]>100);//nst
     element=cv::getStructuringElement(cv::MORPH_ELLIPSE,cv::Size(2*3+1,2*3+1));
     cv::morphologyEx(GreenMask,GreenMask,cv::MORPH_OPEN,element);
     
