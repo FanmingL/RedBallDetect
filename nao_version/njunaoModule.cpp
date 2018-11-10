@@ -173,9 +173,27 @@ void njunaoModule::RefeshMat()
     zyFlag=false;
 }
 
-std::vector<float> njunaoModule::RedBallFind()
+std::vector<float> njunaoModule::RedBallFind(const int &redhmin, const int &redhmax, const int &redsmin, 
+	const int &redsmax, const int &redvmin, const int &redvmax, 
+	const int &greenhmin, const int &greenhmax, const int &greensmin, 
+	const int &greensmax, const int &greenvmin, const int &greenvmax)
+//std::vector<float> njunaoModule::RedBallFind()
 {
-
+/*
+    //change
+    rhmin=redhmin;
+    rhmax=redhmax;
+    rsmin=redsmin;
+    rsmax=redsmax;
+    rvmin=redvmin;
+    rvmax=redvmax;
+    ghmin=greenhmin;
+    ghmax=greenhmax;
+    gsmin=greensmin;
+    gsmax=greensmax;
+    gvmin=greenvmin;
+    gvmax=greenvmax;
+*/
     std::vector<float> PosTrans(15,0);
     if ((!Detecting)&&RefeshingFlag)
     {
@@ -186,8 +204,9 @@ std::vector<float> njunaoModule::RedBallFind()
             std::vector<float> head_pos =  head_pos_global;
             std::vector<float> cam_trans = cam_trans_global;
             
-            std::vector<float> RedBallPosition=DetectRedBall(fIplImageHeader);
-            
+            std::vector<float> RedBallPosition=DetectRedBall(fIplImageHeader,redhmin,redhmax,redsmin,redsmax,redvmin,redvmax,greenhmin,greenhmax,greensmin,greensmax,greenvmin,greenvmax);
+            //std::vector<float> RedBallPosition=DetectRedBall(fIplImageHeader,0,5,100,255,0,255,40,60,100,255,0,255);            
+
             for (int i=0;i<PosTrans.size();i++)PosTrans[i]=0;
             if (!(RedBallPosition[0]==0&&RedBallPosition[1]==0&&RedBallPosition[2]==0))
             {
@@ -239,11 +258,28 @@ std::vector<float> njunaoModule::RedBallFind()
     return PosTrans;
 }
 
-void njunaoModule::ContinuousFindBall()
+void njunaoModule::ContinuousFindBall(const int &redhmin, const int &redhmax, const int &redsmin, 
+	const int &redsmax, const int &redvmin, const int &redvmax, 
+	const int &greenhmin, const int &greenhmax, const int &greensmin, 
+	const int &greensmax, const int &greenvmin, const int &greenvmax)
+//void njunaoModule::ContinuousFindBall()
 {
     std::vector<float> PosTrans(15,0);
-
-    
+ /*
+//change
+    rhmin=redhmin;
+    rhmax=redhmax;
+    rsmin=redsmin;
+    rsmax=redsmax;
+    rvmin=redvmin;
+    rvmax=redvmax;
+    ghmin=greenhmin;
+    ghmax=greenhmax;
+    gsmin=greensmin;
+    gsmax=greensmax;
+    gvmin=greenvmin;
+    gvmax=greenvmax;
+ */
     if ((!Detecting)&&RefeshingFlag)
     {
         while (StartDetect)
@@ -253,8 +289,9 @@ void njunaoModule::ContinuousFindBall()
             std::vector<float> head_pos =  head_pos_global;
             std::vector<float> cam_trans = cam_trans_global;
             
-            std::vector<float> RedBallPosition=DetectRedBall(fIplImageHeader);
-            
+            std::vector<float> RedBallPosition=DetectRedBall(fIplImageHeader,redhmin,redhmax,redsmin,redsmax,redvmin,redvmax,greenhmin,greenhmax,greensmin,greensmax,greenvmin,greenvmax);
+            //std::vector<float> RedBallPosition=DetectRedBall(fIplImageHeader,0,5,100,255,0,255,40,60,100,255,0,255);      
+
             for (int i=0;i<PosTrans.size();i++)PosTrans[i]=0;
             if (!(RedBallPosition[0]==0&&RedBallPosition[1]==0&&RedBallPosition[2]==0))
             {
@@ -308,10 +345,20 @@ void njunaoModule::ContinuousFindBall()
     
 }
 
-std::vector<float> njunaoModule::PoleFind()
+std::vector<float> njunaoModule::PoleFind(const int &yellowhmin, const int &yellowhmax, const int &yellowsmin, 
+	const int &yellowsmax, const int &yellowvmin, const int &yellowvmax)
+//std::vector<float> njunaoModule::PoleFind()
 {
     std::vector<float> PolePos(15,0);
-    
+/*
+    //change
+    yhmin=yellowhmin;
+    yhmax=yellowhmax;
+    ysmin=yellowsmin;
+    ysmax=yellowsmax;
+    yvmin=yellowvmin;
+    yvmax=yellowvmax;
+*/
     if (!PoleDetecting){
         PoleDetecting=true;
         
@@ -319,7 +366,9 @@ std::vector<float> njunaoModule::PoleFind()
             std::vector<float> cam_result = cam_result_global;
             std::vector<float> head_pos =  head_pos_global;
             std::vector<float> cam_trans = cam_trans_global;
-            std::vector<float> PolePos_temp=DetectPole(fIplImageHeader);
+            std::vector<float> PolePos_temp=DetectPole(fIplImageHeader,yellowhmin,yellowhmax,yellowsmin,yellowsmax,yellowvmin,yellowvmax);
+            //std::vector<float> PolePos_temp=DetectPole(fIplImageHeader,80,90,100,255,0,255);
+
             if (!(PolePos_temp[0]==0))
             {
                 PolePos[0]=PolePos_temp[0]/(1.0f*imgWidth);
@@ -362,9 +411,20 @@ std::vector<float> njunaoModule::PoleFind()
     return PolePos;
 }
 
-void njunaoModule::ContinuousFindPole()
+void njunaoModule::ContinuousFindPole(const int &yellowhmin, const int &yellowhmax, const int &yellowsmin, 
+	const int &yellowsmax, const int &yellowvmin, const int &yellowvmax)
+//void njunaoModule::ContinuousFindPole()
 {
     std::vector<float> PolePos(15,0);
+/*
+//change
+    yhmin=yellowhmin;
+    yhmax=yellowhmax;
+    ysmin=yellowsmin;
+    ysmax=yellowsmax;
+    yvmin=yellowvmin;
+    yvmax=yellowvmax;
+*/
     if (!PoleDetecting){
         PoleDetecting=true;
         while (StartDetect&&RefeshingFlag){
@@ -372,7 +432,9 @@ void njunaoModule::ContinuousFindPole()
             std::vector<float> cam_result = cam_result_global;
             std::vector<float> head_pos =  head_pos_global;
             std::vector<float> cam_trans = cam_trans_global;
-            std::vector<float> PolePos_temp=DetectPole(fIplImageHeader);
+            std::vector<float> PolePos_temp=DetectPole(fIplImageHeader,yellowhmin,yellowhmax,yellowsmin,yellowsmax,yellowvmin,yellowvmax);
+            //std::vector<float> PolePos_temp=DetectPole(fIplImageHeader,80,90,100,255,0,255);
+
             for (int i=0;i<PolePos.size();i++)PolePos[i]=0;
             if (!(PolePos_temp[0]==0))
             {

@@ -9,7 +9,8 @@
 #include "main.hpp"
 void on_mouse2(int EVENT, int x, int y, int flags, void* userdata);
 #define _MY_ABS(x) (((x)>0)?((x)):(-(x)))
-std::vector<float> DetectPole(cv::Mat &originalImage)
+std::vector<float> DetectPole(cv::Mat &originalImage, int yellowhmin, int yellowhmax, int yellowsmin, int yellowsmax, int yellowvmin, int yellowvmax)
+//std::vector<float> DetectPole(cv::Mat &originalImage)
 {
     std::vector<float> angle;
     angle.push_back(0);
@@ -26,7 +27,9 @@ std::vector<float> DetectPole(cv::Mat &originalImage)
     originalImage.copyTo(LineImage);
     cv::cvtColor(originalImage, hsvImage, CV_BGR2HSV);
     cv::split(hsvImage, hsv);
-    yellowMask=((hsv[0]>20)&(hsv[0]<34)&(hsv[1]>80));//nju
+
+    yellowMask=((hsv[0]>=yellowhmin)&(hsv[0]<=yellowhmax))&((hsv[1]>=yellowsmin)&(hsv[1]<=yellowsmax))&((hsv[2]>=yellowvmin)&(hsv[2]<=yellowvmax));
+    //yellowMask=((hsv[0]>20)&(hsv[0]<34)&(hsv[1]>80));//nju
     //yellowMask=((hsv[0]>29)&(hsv[0]<40)&(hsv[1]>125));//nst
     
     element=cv::getStructuringElement(cv::MORPH_CROSS,cv::Size(4,4));

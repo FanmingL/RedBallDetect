@@ -14,5 +14,6 @@
 #include "opencv2/imgproc/imgproc.hpp"
 #include "opencv2/highgui/highgui.hpp"
 #include "opencv2/opencv.hpp"
-std::vector<float> DetectPole(cv::Mat &originalImage);
+//std::vector<float> DetectPole(cv::Mat &originalImage);
+std::vector<float> DetectPole(cv::Mat &originalImage, int yellowhmin, int yellowhmax, int yellowsmin, int yellowsmax, int yellowvmin, int yellowvmax);
 #endif /* pole_hpp */

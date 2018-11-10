@@ -10,7 +10,7 @@
 #include <iostream>
 #include "opencv2/core/core.hpp"
 #include <boost/shared_ptr.hpp>
-#include <alproxies/almemoryproxy.h>
+#include <alproxies/almemoryproxy.h>  //代理
 #include <alcommon/almodule.h>
 #include <alproxies/alvideodeviceproxy.h>
 #include <alproxies/altexttospeechproxy.h>
@@ -56,23 +56,30 @@ public:
     /**
      *返回一个容器(x,y)，x为小球x坐标与图像width的比值，y为小球y坐标与图像height的比值
      */
-    std::vector<float> RedBallFind();
-    
+    std::vector<float> RedBallFind(const int &redhmin, const int &redhmax, const int &redsmin, 
+        const int &redsmax, const int &redvmin, const int &redvmax, 
+        const int &greenhmin, const int &greenhmax, const int &greensmin, 
+        const int &greensmax, const int &greenvmin, const int &greenvmax);
+    //std::vector<float> RedBallFind();
     /**
      *持续寻找球，并将球的位置存在"njunaoBallPosition"中
      */
-    void ContinuousFindBall();
-    
+    void ContinuousFindBall(const int &redhmin, const int &redhmax, const int &redsmin, 
+        const int &redsmax, const int &redvmin, const int &redvmax, const int &greenhmin, 
+        const int &greenhmax, const int &greensmin, const int &greensmax, const int &greenvmin, const int &greenvmax);
+    //void ContinuousFindBall();
     /**
      *返回一个容器(x)，x为杆横坐标与图像width的比值
      */
-    std::vector<float> PoleFind();
-    
+    std::vector<float> PoleFind(const int &yellowhmin, const int &yellowhmax, const int &yellowsmin, 
+        const int &yellowsmax, const int &yellowvmin, const int &yellowvmax);
+    //std::vector<float> PoleFind();
     /**
      *持续寻找杆，并将球的位置存在"njunaoPolePosition"中
      */
-    void ContinuousFindPole();
-    
+    void ContinuousFindPole(const int &yellowhmin, const int &yellowhmax, const int &yellowsmin, 
+        const int &yellowsmax, const int &yellowvmin, const int &yellowvmax);
+    //void ContinuousFindPole();
     /**
      *init函数，在构造函数之后立刻被自动调用
      */
@@ -147,7 +154,26 @@ private:
     int Reso;
     
     int pcs;
-    
+/*
+    int rhmin;
+    int rhmax;
+    int rsmin;
+    int rsmax;
+    int rvmin;
+    int rvmax;
+    int ghmin;
+    int ghmax;
+    int gsmin;
+    int gsmax;
+    int gvmin;
+    int gvmax;
+    int yhmin;
+    int yhmax;
+    int ysmin;
+    int ysmax;
+    int yvmin;
+    int yvmax;
+*/ 
     bool zyFlag;
     
     cv::Mat con;

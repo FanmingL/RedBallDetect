@@ -8,7 +8,11 @@
 #include "Detect.hpp"
 void on_mouse(int EVENT, int x, int y, int flags, void* userdata);
 void fillHole(const cv::Mat srcBw, cv::Mat &dstBw);
-std::vector<float> DetectRedBall(cv::Mat &originalImage){
+
+//std::vector<float> DetectRedBall(cv::Mat &originalImage, const int &redhmin, const int &redhmax, const int &redsmin, const int &redsmax, const int &redvmin, const int &redvmax, const int &greenhmin, const int &greenhmax, const int &greensmin, const int &greensmax, const int &greenvmin, const int &greenvmax)
+std::vector<float> DetectRedBall(cv::Mat &originalImage, int redhmin, int redhmax, int redsmin, int redsmax, int redvmin, int redvmax, int greenhmin, int greenhmax, int greensmin, int greensmax, int greenvmin, int greenvmax)
+//std::vector<float> DetectRedBall(cv::Mat &originalImage)
+{
     std::vector<float> BallPosition;
     BallPosition.push_back(0);BallPosition.push_back(0);BallPosition.push_back(0);
     if (originalImage.empty())
@@ -33,8 +37,13 @@ std::vector<float> DetectRedBall(cv::Mat &originalImage){
     std::vector<cv::Mat> hsvChannels;
     cv::cvtColor(originalImage, hsvImage, CV_BGR2HSV);
     cv::split(hsvImage, hsvChannels);
-    RedMask=((hsvChannels[0]>=0)&(hsvChannels[0]<20)|(hsvChannels[0]>175))&(hsvChannels[1]>155);
-    GreenMask=(hsvChannels[0]>37)&(hsvChannels[0]<70)&(hsvChannels[1]>80);//nju
+    // 阈值设置
+	RedMask=((hsvChannels[0]>=redhmin)&(hsvChannels[0]<=redhmax))&((hsvChannels[1]>=redsmin)&(hsvChannels[1]<=redsmax))&((hsvChannels[2]>=redvmin)&(hsvChannels[2]<=redvmax));
+	GreenMask=((hsvChannels[0]>=greenhmin)&(hsvChannels[0]<=greenhmax))&((hsvChannels[1]>=greensmin)&(hsvChannels[1]<=greensmax))&((hsvChannels[2]>=greenvmin)&(hsvChannels[2]<=greenvmax));
+	//RedMask=((hsvChannels[0]>=5)&(hsvChannels[0]<20)|(hsvChannels[0]>175))&(hsvChannels[1]>155);
+	//GreenMask=(hsvChannels[0]>32)&(hsvChannels[0]<45)&(hsvChannels[1]>80);
+    //RedMask=((hsvChannels[0]>=0)&(hsvChannels[0]<20)|(hsvChannels[0]>175))&(hsvChannels[1]>155);
+    //GreenMask=(hsvChannels[0]>37)&(hsvChannels[0]<70)&(hsvChannels[1]>80);//nju
   //  RedMask=((hsvChannels[0]>=0)&(hsvChannels[0]<8)|(hsvChannels[0]>172))&(hsvChannels[1]>120);
   //  GreenMask=(hsvChannels[0]>70)&(hsvChannels[0]<85)&(hsvChannels[1]>100);//nst
     element=cv::getStructuringElement(cv::MORPH_ELLIPSE,cv::Size(2*3+1,2*3+1));
