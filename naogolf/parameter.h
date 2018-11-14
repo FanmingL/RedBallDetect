@@ -12,12 +12,14 @@
 #ifndef _PARAMETER_H
 #define _PARAMETER_H
 #include <string>
+#include <iostream>
 namespace AL {
-class parametergolf{
+class ParameterGolf{
+    friend std::ostream & operator<<(std::ostream &out, ParameterGolf &obj);
 public:
-    parametergolf();
+    ParameterGolf();
 
-    ~parametergolf();
+    ~ParameterGolf();
 
     void readFromFile(const std::string &path);
 
@@ -38,6 +40,10 @@ public:
 
     /* move data */
 
+    float move_pid_p;
+
+    /* debug data */
+    std::string thing, detect_algorithm, decision_algorithm;
 
 };
 }

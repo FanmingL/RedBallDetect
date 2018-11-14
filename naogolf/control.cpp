@@ -1,23 +1,20 @@
 /*================================================================
 *   Copyright (C) 2018 * Ltd. All rights reserved.
 *   
-*   File name   : decision.cpp
+*   File name   : control.cpp
 *   Author      : FanmingL
-*   Created date: 2018-11-14 13:07:23
+*   Created date: 2018-11-14 13:18:24
 *   Description : 
 *
 *===============================================================*/
 
 
+
 #include "naogolf.h"
 
+
 namespace AL {
-void naogolf::initDecision(){
-}
-
-
-void naogolf::executeDecision(){
+void naogolf::initControl(){
 
 }
 }
-

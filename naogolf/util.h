@@ -11,6 +11,7 @@
 
 #ifndef _UTIL_H
 #define _UTIL_H
+
 namespace AL {
 class watch_dog
 {
@@ -26,5 +27,8 @@ public:
 private:
     int count_now, max_count;
 };
+
+void delayMs(const unsigned int &msecs);
+
 }
 #endif //UTIL_H

@@ -1,23 +1,16 @@
 /*================================================================
 *   Copyright (C) 2018 * Ltd. All rights reserved.
 *   
-*   File name   : decision.cpp
+*   File name   : fsm.h
 *   Author      : FanmingL
-*   Created date: 2018-11-14 13:07:23
+*   Created date: 2018-11-14 13:02:28
 *   Description : 
 *
 *===============================================================*/
 
 
-#include "naogolf.h"
+#ifndef _FSM_H
+#define _FSM_H
+#include "decision_base.h"
 
-namespace AL {
-void naogolf::initDecision(){
-}
-
-
-void naogolf::executeDecision(){
-
-}
-}
-
+#endif //FSM_H

@@ -1,0 +1,36 @@
+%YAML:1.0
+---
+thing: "hello world"
+
+ball_red_h_max: 7
+ball_red_h_min: 175
+ball_red_s_max: 255
+ball_red_s_min: 0
+ball_red_v_max: 255
+ball_red_v_min: 0
+
+ball_green_h_max: 70
+ball_green_h_min: 40
+ball_green_s_max: 255
+ball_green_s_min: 0
+ball_green_v_max: 255
+ball_green_v_min: 0
+
+pole_yellow_h_max: 100
+pole_yellow_h_min: 50
+pole_yellow_s_max: 255
+pole_yellow_s_min: 0
+pole_yellow_v_max: 255
+pole_yellow_v_min: 0
+
+stage_index: -1
+
+move_pid_p: 1.2
+
+detect_algorithm: "constraint_limit"
+decision_algorithm: "fsm"
+
+
+
+
+
