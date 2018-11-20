@@ -26,6 +26,7 @@ public:
     Status status_now;
     float ball_x, ball_y, pole_x, pole_y;
     int game_round;
+    double time_now;
 };
 
 class DecisionMessage{
@@ -35,6 +36,7 @@ public:
     float expect_speed_rotate;
     float expect_pitch;
     float expect_yaw;
+    double time_now;
 
 };
 

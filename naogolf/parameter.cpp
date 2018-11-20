@@ -55,6 +55,9 @@ void ParameterGolf::readFromFile(const std::string &path)
     fs["pole_yellow_s_max"] >> pole_yellow_s_max;
     fs["pole_yellow_v_min"] >> pole_yellow_v_min;
     fs["pole_yellow_v_max"] >> pole_yellow_v_max;
+
+    fs["width"] >> width;
+    fs["height"] >> height;
 }
 
 void ParameterGolf::writeToFile(const std::string &path)
@@ -85,7 +88,9 @@ std::ostream & operator<<(std::ostream &out, ParameterGolf &obj){
       <<"pole_yellow_s_min: "<<obj.pole_yellow_s_min<<std::endl\
       <<"pole_yellow_s_max: "<<obj.pole_yellow_s_max<<std::endl\
       <<"pole_yellow_v_min: "<<obj.pole_yellow_v_min<<std::endl\
-      <<"pole_yellow_v_max: "<<obj.pole_yellow_v_max<<std::endl;
+      <<"pole_yellow_v_max: "<<obj.pole_yellow_v_max<<std::endl\
+      <<"width: "<<obj.width<<std::endl\
+      <<"height: "<<obj.height<<std::endl;
     return out;
 }
 }

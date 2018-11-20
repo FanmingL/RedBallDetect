@@ -24,6 +24,7 @@ public:
     };
     DetectStatus status;
     float pole_x, pole_y, ball_x, ball_y;
+    double time_now;
 };
 
 

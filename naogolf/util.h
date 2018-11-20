@@ -11,6 +11,12 @@
 
 #ifndef _UTIL_H
 #define _UTIL_H
+#include <boost/chrono.hpp>
+#include <boost/thread.hpp>
+
+#define DELAY_THREAD_MS(ms) (boost::this_thread::sleep(boost::posix_time::milliseconds(ms)))
+#define DELAY_MS(ms) (boost::thread::sleep(boost::posix_time::milliseconds(ms))
+
 
 namespace AL {
 class watch_dog
@@ -28,7 +34,7 @@ private:
     int count_now, max_count;
 };
 
-void delayMs(const unsigned int &msecs);
+//void delayMs(const unsigned int &msecs);
 
 }
 #endif //UTIL_H

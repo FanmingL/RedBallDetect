@@ -45,6 +45,8 @@ public:
     /* debug data */
     std::string thing, detect_algorithm, decision_algorithm;
 
+    int width, height;
+
 };
 }
 

@@ -30,7 +30,7 @@ move_pid_p: 1.2
 detect_algorithm: "constraint_limit"
 decision_algorithm: "fsm"
 
-
-
+width: 640
+height: 480
 
 
