@@ -33,4 +33,16 @@ decision_algorithm: "fsm"
 width: 640
 height: 480
 
+camera_matrix: !!opencv-matrix
+    rows: 3
+    cols: 3
+    dt: d
+    data: [ 562.546487626155 , 0, 331.020749304873, 0, 560.726740317221, 229.930167086478, 0, 0, 1.0000 ]
 
+distort_matrix: !!opencv-matrix
+    rows: 4
+    cols: 1
+    dt: d
+    data: [ -0.0625362260288806,0.0969517251981310, 0.0, 0.0]
+
+fps: 30

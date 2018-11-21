@@ -12,27 +12,53 @@
 #include "constraint_limit.h"
 
 
-ConstraintLimit::ConstraintLimit(const std::string &name):DetectionBase(name)
+ConstraintSetBall::ConstraintSetBall(const std::string &name):DetectionBase(name)
 {
 
 }
 
-ConstraintLimit::~ConstraintLimit()
+ConstraintSetBall::~ConstraintSetBall()
 {
 
 }
 
-void ConstraintLimit::init()
+void ConstraintSetBall::init()
 {
 
 }
 
-void ConstraintLimit::getParameter(const AL::ParameterGolf &parameter)
+void ConstraintSetBall::getParameter(const AL::ParameterGolf &parameter)
 {
 
 }
 
-void ConstraintLimit::executeDetection(const cv::Mat &src, DetectionMessage &detect)
+void ConstraintSetBall::executeDetection(const cv::Mat &src, DetectionMessage &detect)
+{
+
+}
+
+
+ConstraintSetPole::ConstraintSetPole(const std::string &name) : DetectionBase(name)
+{
+
+}
+
+ConstraintSetPole::~ConstraintSetPole()
+{
+
+}
+
+void ConstraintSetPole::init()
+{
+
+}
+
+void ConstraintSetPole::getParameter(const AL::ParameterGolf &parameter)
+{
+
+}
+
+void ConstraintSetPole::executeDetection(const cv::Mat &src, DetectionMessage &detect)
 {
 
 }

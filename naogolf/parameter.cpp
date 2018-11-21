@@ -58,6 +58,11 @@ void ParameterGolf::readFromFile(const std::string &path)
 
     fs["width"] >> width;
     fs["height"] >> height;
+
+    fs["camera_matrix"] >> camera_matrix;
+    fs["distort_matrix"] >> distort_matrix;
+
+    fs["fps"] >> fps;
 }
 
 void ParameterGolf::writeToFile(const std::string &path)
@@ -90,7 +95,10 @@ std::ostream & operator<<(std::ostream &out, ParameterGolf &obj){
       <<"pole_yellow_v_min: "<<obj.pole_yellow_v_min<<std::endl\
       <<"pole_yellow_v_max: "<<obj.pole_yellow_v_max<<std::endl\
       <<"width: "<<obj.width<<std::endl\
-      <<"height: "<<obj.height<<std::endl;
+      <<"height: "<<obj.height<<std::endl\
+      <<"camera_matrix: "<<obj.camera_matrix<<std::endl\
+      <<"distort_matrix: "<<obj.distort_matrix<<std::endl\
+      <<"fps: "<<obj.fps<<std::endl;
     return out;
 }
 }

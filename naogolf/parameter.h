@@ -13,6 +13,7 @@
 #define _PARAMETER_H
 #include <string>
 #include <iostream>
+#include <opencv2/core/core.hpp>
 namespace AL {
 class ParameterGolf{
     friend std::ostream & operator<<(std::ostream &out, ParameterGolf &obj);
@@ -46,6 +47,12 @@ public:
     std::string thing, detect_algorithm, decision_algorithm;
 
     int width, height;
+
+    cv::Mat camera_matrix;
+
+    cv::Mat distort_matrix;
+
+    int fps;
 
 };
 }

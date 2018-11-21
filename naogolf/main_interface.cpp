@@ -14,14 +14,14 @@
 namespace AL {
 naogolf::naogolf(boost::shared_ptr<ALBroker> broker, const std::string &name):
     ALModule(broker, name),
-    _version("version 0.1.0"),
+    _version("version 0.1.8"),
     text_to_speech(getParentBroker()),
     video_device_proxy(getParentBroker()),
     parameter_path("/home/nao/naoqi/config.yml"),
     execute_flag(false),
     if_video_registered(false)
 {
-    detect_message.time_now = decision_message.time_now = -1;
+    detect_ball_message.time_now = detect_pole_message.time_now = decision_message.time_now = -10000;
     setModuleDescription("Nanjing University Nao Golf Programe");
 
     /*
@@ -48,6 +48,8 @@ naogolf::naogolf(boost::shared_ptr<ALBroker> broker, const std::string &name):
     functionName("saveImage", getName(), "save image as certain name");
     BIND_METHOD(naogolf::saveImage);
 
+    functionName("getExecuteStatus", getName(), "get the executing status");
+    BIND_METHOD(naogolf::getExecuteStatus);
 }
 
 void naogolf::init(){
@@ -66,12 +68,12 @@ void naogolf::execute(const int &game_index){
     }
     setExecuteStatus(true);
     executeVision();
-    int counter = 0;
+    /*int counter = 0;
     while(getExecuteStatus()){
         DELAY_THREAD_MS(1000);
         qiLogInfo(getName().c_str()) << counter++<<std::endl;
-    }
     qiLogInfo(getName().c_str()) << "stop execute" <<std::endl;
+    */
 }
 
 void naogolf::stopExecute(){

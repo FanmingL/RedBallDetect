@@ -14,44 +14,78 @@
 
 namespace AL{
 void naogolf::initVision(){
-    detection_algorithm = boost::make_shared<ConstraintLimit>();
+    ball_detection_algorithm = boost::make_shared<ConstraintSetBall>();
+    pole_detection_algorithm = boost::make_shared<ConstraintSetPole>();
+    cv::initUndistortRectifyMap(parameters.camera_matrix, parameters.distort_matrix, cv::Mat(), parameters.camera_matrix,
+                                cv::Size(parameters.width, parameters.height),CV_16SC2, undistort_map1, undistort_map2);
 }
 
 void naogolf::executeVision(){
     boost::thread thread_get_image(boost::bind(&naogolf::getImage, this, TOP_CAMERA));
     thread_get_image.detach();
+    DELAY_THREAD_MS(100);
+    boost::thread thread_ball_detection(boost::bind(&naogolf::detectBall, this));
+    boost::thread thread_pole_detection(boost::bind(&naogolf::detectPole, this));
+    thread_ball_detection.detach();
+    thread_pole_detection.detach();
 }
 
-void naogolf::processImage(){
+void naogolf::detectBall(){
     cv::Mat image_cpy;
     DetectionMessage detect_res;
     while (getExecuteStatus() && getVideoRegisterStatus()){
         {
             boost::unique_lock<boost::mutex> _unique_lock(mutex_image);
-            image_cpy = image.clone();
+            image.copyTo(image_cpy);
         }
         if (image_cpy.empty())DELAY_THREAD_MS(50);
         else{
-            detection_algorithm->executeDetection(image_cpy, detect_res);
+            ball_detection_algorithm->executeDetection(image_cpy, detect_res);
+            DELAY_THREAD_MS(100);
             {
-                boost::unique_lock<boost::mutex> _unique_lock(mutex_detect_message);
-                detect_message = detect_res;
+                boost::unique_lock<boost::mutex> _unique_lock(mutex_ball_detect_message);
+                detect_ball_message = detect_res;
             }
         }
     }
-    qiLogInfo(getName().c_str()) << "stop process" << std::endl;
+    qiLogInfo(getName().c_str()) << "stop detect ball" << std::endl;
+}
+
+void naogolf::detectPole(){
+    cv::Mat image_cpy;
+    DetectionMessage detect_res;
+    while (getExecuteStatus() && getVideoRegisterStatus()){
+        {
+            boost::unique_lock<boost::mutex> _unique_lock(mutex_image);
+            image.copyTo(image_cpy);
+        }
+        if (image_cpy.empty())DELAY_THREAD_MS(50);
+        else{
+            DELAY_THREAD_MS(100);
+            pole_detection_algorithm->executeDetection(image_cpy, detect_res);
+            {
+                boost::unique_lock<boost::mutex> _unique_lock(mutex_pole_detect_message);
+                detect_pole_message = detect_res;
+            }
+        }
+    }
+    qiLogInfo(getName().c_str()) << "stop detect pole" << std::endl;
 }
 
 void naogolf::getImage(int selected_camera_index){
     registerVideoDevice(selected_camera_index, parameters.width, parameters.height);
+    boost::chrono::high_resolution_clock::time_point now;
+    cv::Mat image_cpy(cv::Size(parameters.width, parameters.height), CV_8UC3, cv::Scalar(0, 0, 0));
     while(getExecuteStatus() && getVideoRegisterStatus()){	
+        now = boost::chrono::high_resolution_clock::now();
         image_ptr = (ALImage*)video_device_proxy.getImageLocal(video_device_handler);
+        image_cpy.data = image_ptr->getData();
         {
             boost::unique_lock<boost::mutex> _unique_lock(mutex_image);
-            image.data = image_ptr->getData();
+            cv::remap(image_cpy, image, undistort_map1, undistort_map2, cv::INTER_LINEAR);
         }
         video_device_proxy.releaseImage(video_device_handler);
-        DELAY_THREAD_MS(15);
+        boost::this_thread::sleep_until(now + boost::chrono::milliseconds(1000 / parameters.fps));
     }
     unRegisterVideoDevice();
     qiLogInfo(getName().c_str()) << "stop get image" <<std::endl;
@@ -75,7 +109,7 @@ void naogolf::registerVideoDevice(int selected_camera_index, int width, int heig
         boost::unique_lock<boost::mutex> _unique_lock(mutex_image);
         image = cv::Mat(cv::Size(width, height), CV_8UC3, cv::Scalar(0, 0, 0));
     }
-    video_device_handler = video_device_proxy.subscribe(video_name, resolution_type, color_space, 30);
+    video_device_handler = video_device_proxy.subscribeCamera(video_name, selected_camera_index, resolution_type, color_space, parameters.fps);
     qiLogInfo(getName().c_str()) << "successfully subsrcibe the device, which name is "<< video_device_handler << std::endl;
 
     setVideoRegisterStatus(true);
@@ -103,12 +137,17 @@ void naogolf::setVideoRegisterStatus(bool status){
 }
 
 bool naogolf::saveImage(const std::string &image_name){
-    boost::unique_lock<boost::mutex> _unique_lock(mutex_image);
+    cv::Mat image_cpy;
+    {
+        boost::unique_lock<boost::mutex> _unique_lock(mutex_image);
+        image.copyTo(image_cpy);
+    }
     std::string _path("/home/nao/naoqi/");
+
     _path += image_name;
     if ((getExecuteStatus() && getVideoRegisterStatus()))
     {
-        return cv::imwrite(_path, image);
+        return cv::imwrite(_path, image_cpy);
     }else{
         qiLogError(getName().c_str()) << "module has not been execute now" <<std::endl;
         return false;

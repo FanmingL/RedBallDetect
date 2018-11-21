@@ -14,11 +14,11 @@
 #include "image_util.h"
 #include "detection_base.h"
 
-class ConstraintLimit : public DetectionBase{
+class ConstraintSetBall : public DetectionBase{
 public:
-    ConstraintLimit(const std::string &name = std::string("constraint limit"));
+    ConstraintSetBall(const std::string &name = std::string("constraint set ball"));
 
-    virtual ~ConstraintLimit();
+    virtual ~ConstraintSetBall();
 
     virtual void init();
 
@@ -26,6 +26,20 @@ public:
 
     virtual void executeDetection(const cv::Mat &src, DetectionMessage &detect);
 };
+
+class ConstraintSetPole : public DetectionBase{
+public:
+    ConstraintSetPole(const std::string &name = std::string("constraint set pole"));
+
+    virtual ~ConstraintSetPole();
+
+    virtual void init();
+
+    virtual void getParameter(const AL::ParameterGolf &parameter);
+
+    virtual void executeDetection(const cv::Mat &src, DetectionMessage &detect);
+};
+
 
 
 #endif //CONSTRAINT_LIMIT_H

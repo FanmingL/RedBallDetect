@@ -19,6 +19,7 @@
 #include <alproxies/alvideodeviceproxy.h>
 #include <alcommon/almodulecore.h>
 #include <alvision/alimage.h>
+#include <alproxies/almotionproxy.h>
 
 #include <boost/shared_ptr.hpp>
 #include <boost/typeof/typeof.hpp>
@@ -161,9 +162,14 @@ public:
     bool saveImage(const std::string &image_name);
 
     /*
-     * process image
+     * detect ball
      */
-    void processImage();
+    void detectBall();
+
+    /*
+     * detect pole
+     */
+    void detectPole();
 
 private:
 
@@ -185,7 +191,7 @@ private:
 
     boost::shared_ptr<DecisionBase> decision_algorithm;
 
-    boost::shared_ptr<DetectionBase> detection_algorithm;
+    boost::shared_ptr<DetectionBase> ball_detection_algorithm, pole_detection_algorithm;
 
     boost::chrono::high_resolution_clock::time_point start_time_point;
 
@@ -203,13 +209,15 @@ private:
 
     std::string video_device_handler;
 
-    DetectionMessage detect_message;
+    DetectionMessage detect_ball_message, detect_pole_message;
 
-    boost::mutex mutex_detect_message;
+    boost::mutex mutex_ball_detect_message, mutex_pole_detect_message;
 
     DecisionMessage decision_message;
 
     boost::mutex mutex_decision_message;
+
+    cv::Mat undistort_map1, undistort_map2;
 };
 }
 
